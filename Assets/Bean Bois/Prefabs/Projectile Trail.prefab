@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 9187980987410003827}
-  unitsPerSecond: 64
+  unitsPerSecond: 128
   trailLength: 1
   projectileSparkPrefab: {fileID: 3041622955215696114, guid: 9e0d0a08160930a47aecdfd140e3a371,
     type: 3}

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Player : NetworkBehaviour
+public class PlayerShoot : NetworkBehaviour
 {
     // Private Runtime Set Unity References
     private GameManager manager;
@@ -76,7 +76,7 @@ public class Player : NetworkBehaviour
             Vector3 a = muzzleTransform.position;
             if (Physics.Raycast(muzzleTransform.position, Camera.main.transform.forward, out var hit, 1024f))
             {
-                if (hit.transform.TryGetComponent(out Player player))
+                if (hit.transform.TryGetComponent(out PlayerShoot player))
                 {
                     manager.SpawnProjectileTrail(a, hit.point, true, hit.normal);
                     CmdHitPlayer(player.netId, a, hit.point - player.transform.position, hit.normal);
@@ -106,7 +106,7 @@ public class Player : NetworkBehaviour
     public void RpcHitPlayer(uint netId, Vector3 a, Vector3 bLocalPositionOnPlayer, Vector3 hitNormal)
     {
         // TODO FindObjects bad???
-        foreach (var player in FindObjectsOfType<Player>())
+        foreach (var player in FindObjectsOfType<PlayerShoot>())
         {
             if (player.netId == netId)
             {

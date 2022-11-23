@@ -1,3 +1,4 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,9 +7,34 @@ using UnityEngine;
     Items will be deleted when client that last touched them disconnects, not good
 */
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     public Player LocalPlayer { get; private set; }
+    public NetRefLookup<Player> PlayerLookup { get; private set; }
+
+    #region Unity Callbacks
+    private void Awake()
+    {
+        PlayerLookup = new();
+    }
+    private void FixedUpdate()
+    {
+        if (isServer)
+        {
+            foreach (var kvp in NetworkServer.spawned)
+            {
+                print(kvp);
+            }
+        }
+        else
+        {
+            foreach (var kvp in NetworkClient.spawned)
+            {
+                print(kvp);
+            }
+        }
+    }
+    #endregion Unity Callbacks
 
     /*
     [Header("Prefabs")]
@@ -20,4 +46,11 @@ public class GameManager : MonoBehaviour
         projectileTrail.Init(a, b, hitObject, hitNormal);
     }
     */
+
+    #region Reference Management
+    public void SetLocalPlayer(Player localPlayer)
+    {
+        LocalPlayer = localPlayer;
+    }
+    #endregion Reference Management
 }

@@ -78,19 +78,19 @@ public class PlayerShoot : NetworkBehaviour
             {
                 if (hit.transform.TryGetComponent(out PlayerShoot player))
                 {
-                    manager.SpawnProjectileTrail(a, hit.point, true, hit.normal);
+                    //manager.SpawnProjectileTrail(a, hit.point, true, hit.normal);
                     CmdHitPlayer(player.netId, a, hit.point - player.transform.position, hit.normal);
                 }
                 else
                 {
-                    manager.SpawnProjectileTrail(a, hit.point, true, hit.normal);
+                    //manager.SpawnProjectileTrail(a, hit.point, true, hit.normal);
                     CmdHit(a, hit.point, true, hit.normal);
                 }
             }
             else
             {
                 Vector3 b = muzzleTransform.position + Camera.main.transform.forward * 1024f;
-                manager.SpawnProjectileTrail(muzzleTransform.position, muzzleTransform.position + Camera.main.transform.forward * 1024f, false, Vector3.zero);
+                //manager.SpawnProjectileTrail(muzzleTransform.position, muzzleTransform.position + Camera.main.transform.forward * 1024f, false, Vector3.zero);
                 CmdHit(a, b, false, Vector3.zero);
             }
         }
@@ -111,7 +111,7 @@ public class PlayerShoot : NetworkBehaviour
             if (player.netId == netId)
             {
                 Vector3 b = player.transform.position + bLocalPositionOnPlayer;
-                manager.SpawnProjectileTrail(a, b, true, hitNormal);
+                //manager.SpawnProjectileTrail(a, b, true, hitNormal);
                 break;
             }
         }
@@ -126,7 +126,7 @@ public class PlayerShoot : NetworkBehaviour
     [ClientRpc]
     public void RpcHit(Vector3 a, Vector3 b, bool hitObject, Vector3 hitNormal)
     {
-        manager.SpawnProjectileTrail(a, b, hitObject, hitNormal);
+        //manager.SpawnProjectileTrail(a, b, hitObject, hitNormal);
     }
 
     private void Move()

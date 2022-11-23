@@ -1,5 +1,6 @@
 using Mirror;
 using Mirror.Examples.Benchmark;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,13 @@ public class Player : NetworkBehaviour
     private bool isCursorVisible = false;
     #endregion Fields
 
+    #region Unity Callbacks
+    private void Awake()
+    {
+        manager = FindObjectOfType<GameManager>(true);
+    }
+    #endregion Unity Callbacks
+
     #region Mirror Callbacks
     public override void OnStartClient()
     {
@@ -27,9 +35,15 @@ public class Player : NetworkBehaviour
             invisibleToSelf.ForEach(go => go.SetActive(false));
 
             manager.SetLocalPlayer(this);
-
-            NetworkServer.spawned
         }
+    }
+    public override void OnStartServer()
+    {
+        manager.PlayerLookup.TryAdd(netId, this);
+    }
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
     }
     #endregion Mirror Callbacks
 }

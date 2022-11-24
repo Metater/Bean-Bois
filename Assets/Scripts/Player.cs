@@ -19,23 +19,38 @@ public class Player : NetworkBehaviour
     private void Awake()
     {
         manager = FindObjectOfType<GameManager>(true);
+
+        playerMovement.PlayerAwake();
+
+        UpdateCursorVisibility();
+    }
+    private void Start()
+    {
+        playerMovement.PlayerStart();
+    }
+    private void Update()
+    {
+        playerMovement.PlayerUpdate();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            isCursorVisible = !isCursorVisible;
+            UpdateCursorVisibility();
+        }
     }
     #endregion Unity Callbacks
 
     #region Mirror Callbacks
-    public override void OnStartClient()
+    public override void OnStartLocalPlayer()
     {
-        if (isLocalPlayer)
-        {
-            // Position own camera
-            Camera.main.transform.SetParent(transform);
-            Camera.main.transform.localPosition = new Vector3(0, 1.6f, 0);
+        // Position own camera
+        Camera.main.transform.SetParent(transform);
+        Camera.main.transform.localPosition = new Vector3(0, 1.6f, 0);
 
-            // Make own GameObjects invisible
-            invisibleToSelf.ForEach(go => go.SetActive(false));
+        // Make own GameObjects invisible
+        invisibleToSelf.ForEach(go => go.SetActive(false));
 
-            manager.SetLocalPlayer(this);
-        }
+        manager.SetLocalPlayer(this);
     }
     public override void OnStartServer()
     {
@@ -43,7 +58,31 @@ public class Player : NetworkBehaviour
     }
     public override void OnStopClient()
     {
-        base.OnStopClient();
+        manager.PlayerLookup.TryRemoveWithNetId(netId, out _);
+    }
+    public override void OnStopServer()
+    {
+        manager.PlayerLookup.TryRemoveWithNetId(netId, out _);
     }
     #endregion Mirror Callbacks
+
+    private void UpdateCursorVisibility()
+    {
+        if (isCursorVisible)
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        Cursor.visible = isCursorVisible;
+    }
+
+    public interface IPlayerCallbacks
+    {
+        public void PlayerAwake();
+        public void PlayerStart();
+        public void PlayerUpdate();
+    }
 }

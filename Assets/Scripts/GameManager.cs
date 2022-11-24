@@ -17,23 +17,6 @@ public class GameManager : NetworkBehaviour
     {
         PlayerLookup = new();
     }
-    private void FixedUpdate()
-    {
-        if (isServer)
-        {
-            foreach (var kvp in NetworkServer.spawned)
-            {
-                print(kvp);
-            }
-        }
-        else
-        {
-            foreach (var kvp in NetworkClient.spawned)
-            {
-                print(kvp);
-            }
-        }
-    }
     #endregion Unity Callbacks
 
     /*

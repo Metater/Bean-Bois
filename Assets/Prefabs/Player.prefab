@@ -130,7 +130,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2814bbdba4897114297b3e39d4193f46, type: 2}
+  - {fileID: 2100000, guid: c3c6369db2b4e974785bba9f884e0fc7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -161,8 +161,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 124740535598638590}
-  - component: {fileID: 2725252038686675284}
+  - component: {fileID: -8637209812853527664}
+  - component: {fileID: -4002994996597634760}
   - component: {fileID: 3133055491900540427}
+  - component: {fileID: 2725252038686675284}
   - component: {fileID: 7734917177985079050}
   - component: {fileID: -2777430846514871914}
   - component: {fileID: -2776958652700574749}
@@ -190,20 +192,52 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &2725252038686675284
-CapsuleCollider:
+--- !u!114 &-8637209812853527664
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 124740535598638578}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9f8c13c21399904883940d9e6957bc3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
+  playerMovement: {fileID: -4002994996597634760}
+  invisibleToSelf:
+  - {fileID: 124740535750356295}
+  - {fileID: 124740536116869578}
+  - {fileID: 124740536513043938}
+--- !u!114 &-4002994996597634760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124740535598638578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9221c761ae1e0b64d9d1f9c32d6601f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
+  player: {fileID: -8637209812853527664}
+  controller: {fileID: 3133055491900540427}
+  handsTransform: {fileID: 124740536068971564}
+  walkingSpeed: 5
+  runningSpeed: 7.5
+  jumpSpeed: 8
+  gravity: 20
+  moveSmoothTime: 0.01
+  lookSpeed: 2
+  lookXLimit: 90
+  velocityAveragingQueueSize: 3
 --- !u!143 &3133055491900540427
 CharacterController:
   m_ObjectHideFlags: 0
@@ -221,6 +255,20 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!136 &2725252038686675284
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124740535598638578}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &7734917177985079050
 MonoBehaviour:
@@ -955,7 +1003,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6235473077595167853
 Transform:
   m_ObjectHideFlags: 0

@@ -214,6 +214,8 @@ MonoBehaviour:
   - {fileID: 124740535750356295}
   - {fileID: 124740536116869578}
   - {fileID: 124740536513043938}
+  ballThrowSpeed: 100
+  ballThrowDistance: 2
 --- !u!114 &-4002994996597634760
 MonoBehaviour:
   m_ObjectHideFlags: 0

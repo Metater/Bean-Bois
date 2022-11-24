@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     private bool isCursorVisible = true;
     public Image crosshairImage;
     public Transform generalTransform;
+    public Rigidbody ball;
 
     #region Unity Callbacks
     private void Awake()

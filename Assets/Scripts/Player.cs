@@ -13,6 +13,8 @@ public class Player : NetworkBehaviour
     public PlayerMovement playerMovement;
     public PlayerInteraction playerInteraction;
     [SerializeField] private List<GameObject> invisibleToSelf;
+    [SerializeField] private float ballThrowSpeed;
+    [SerializeField] private float ballThrowDistance;
     #endregion Fields
 
     #region Unity Callbacks
@@ -32,6 +34,14 @@ public class Player : NetworkBehaviour
     {
         playerMovement.PlayerUpdate();
         playerInteraction.PlayerUpdate();
+
+        if (Input.GetMouseButtonDown(2))
+        {
+            Camera camera = Camera.main;
+            Vector3 position = camera.transform.position;
+            Vector3 direction = camera.transform.forward;
+            CmdThrowBall(position + (direction * ballThrowDistance), direction);
+        }
     }
     #endregion Unity Callbacks
 
@@ -83,5 +93,16 @@ public class Player : NetworkBehaviour
         public void PlayerAwake();
         public void PlayerStart();
         public void PlayerUpdate();
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdThrowBall(Vector3 position, Vector3 direction)
+    {
+        manager.ball.angularVelocity = Vector3.zero;
+        manager.ball.velocity = Vector3.zero;
+
+        manager.ball.position = position;
+
+        manager.ball.AddForce(direction.normalized * ballThrowSpeed, ForceMode.VelocityChange);
     }
 }

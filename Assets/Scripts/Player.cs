@@ -11,8 +11,8 @@ public class Player : NetworkBehaviour
     [Header("General")]
     private GameManager manager;
     public PlayerMovement playerMovement;
+    public PlayerInteraction playerInteraction;
     [SerializeField] private List<GameObject> invisibleToSelf;
-    private bool isCursorVisible = false;
     #endregion Fields
 
     #region Unity Callbacks
@@ -21,22 +21,17 @@ public class Player : NetworkBehaviour
         manager = FindObjectOfType<GameManager>(true);
 
         playerMovement.PlayerAwake();
-
-        UpdateCursorVisibility();
+        playerInteraction.PlayerAwake();
     }
     private void Start()
     {
         playerMovement.PlayerStart();
+        playerInteraction.PlayerStart();
     }
     private void Update()
     {
         playerMovement.PlayerUpdate();
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            isCursorVisible = !isCursorVisible;
-            UpdateCursorVisibility();
-        }
+        playerInteraction.PlayerUpdate();
     }
     #endregion Unity Callbacks
 
@@ -52,32 +47,36 @@ public class Player : NetworkBehaviour
 
         manager.SetLocalPlayer(this);
     }
+    public override void OnStartClient()
+    {
+        if (!isServer)
+        {
+            manager.PlayerLookup.TryAdd(netId, this);
+        }
+    }
     public override void OnStartServer()
     {
         manager.PlayerLookup.TryAdd(netId, this);
     }
+    public override void OnStopLocalPlayer()
+    {
+        // Reset transform of own camera
+        Camera.main.transform.SetParent(manager.generalTransform);
+
+        manager.SetLocalPlayer(null);
+    }
     public override void OnStopClient()
     {
-        manager.PlayerLookup.TryRemoveWithNetId(netId, out _);
+        if (!isServer)
+        {
+            manager.PlayerLookup.TryRemoveWithNetId(netId, out _);
+        }
     }
     public override void OnStopServer()
     {
         manager.PlayerLookup.TryRemoveWithNetId(netId, out _);
     }
     #endregion Mirror Callbacks
-
-    private void UpdateCursorVisibility()
-    {
-        if (isCursorVisible)
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-        Cursor.visible = isCursorVisible;
-    }
 
     public interface IPlayerCallbacks
     {

@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProjectileTrail : MonoBehaviour
+public class ArchiveProjectileTrail : MonoBehaviour
 {
     [SerializeField] private LineRenderer lineRenderer;
     [SerializeField] private float unitsPerSecond;
     [SerializeField] private float trailLength;
 
-    [SerializeField] private ProjectileSpark projectileSparkPrefab;
+    [SerializeField] private ArchiveProjectileSpark projectileSparkPrefab;
 
     private float magnitude = 0;
     private float distanceToTravel;

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProjectileSpark : MonoBehaviour
+public class ArchiveProjectileSpark : MonoBehaviour
 {
     [SerializeField] private ParticleSystem spark;
 

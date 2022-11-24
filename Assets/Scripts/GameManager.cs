@@ -2,20 +2,45 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /*
     Items will be deleted when client that last touched them disconnects, not good
 */
 
-public class GameManager : NetworkBehaviour
+public class GameManager : MonoBehaviour
 {
     public Player LocalPlayer { get; private set; }
     public NetRefLookup<Player> PlayerLookup { get; private set; }
+    public NetRefLookup<Item> ItemLookup { get; private set; }
+    private bool isCursorVisible = true;
+    public Image crosshairImage;
+    public Transform generalTransform;
 
     #region Unity Callbacks
     private void Awake()
     {
         PlayerLookup = new();
+        ItemLookup = new();
+
+        UpdateCursorVisibility();
+    }
+    private void FixedUpdate()
+    {
+        /*
+        foreach (var player in PlayerLookup.Refs)
+        {
+            print($"Player: {player.netId}");
+        }
+        */
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            isCursorVisible = !isCursorVisible;
+            UpdateCursorVisibility();
+        }
     }
     #endregion Unity Callbacks
 
@@ -36,4 +61,17 @@ public class GameManager : NetworkBehaviour
         LocalPlayer = localPlayer;
     }
     #endregion Reference Management
+
+    private void UpdateCursorVisibility()
+    {
+        if (isCursorVisible)
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        Cursor.visible = isCursorVisible;
+    }
 }

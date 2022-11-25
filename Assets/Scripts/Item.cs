@@ -47,6 +47,14 @@ public abstract class Item : NetworkBehaviour
     {
         manager.ItemLookup.TryRemoveWithNetId(netId, out _);
     }
+    public override void OnStartAuthority()
+    {
+        
+    }
+    public override void OnStopAuthority()
+    {
+        
+    }
     #endregion Mirror Callbacks
 
     public void Pickup()

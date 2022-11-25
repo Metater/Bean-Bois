@@ -23,6 +23,7 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
     private float moveY = 0;
     private float moveXSmoothVelocity = 0;
     private float moveYSmoothVelocity = 0;
+    private bool wasGrounded = true;
     [Header("Look")]
     [SerializeField] private float lookSpeed;
     [SerializeField] private float lookXLimit;
@@ -105,6 +106,9 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
         Vector3 moveDelta = moveVelocity * Time.deltaTime;
         controller.Move(moveDelta);
 
+        if (wasGrounded && !controller.isGrounded && moveVelocity.y < 0)
+            moveVelocity.y = 0;
+
         rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
         rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
 
@@ -121,5 +125,7 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
             transform.position = new Vector3(0, 25, 0);
             moveVelocity.y = 0f;
         }
+
+        wasGrounded = controller.isGrounded;
     }
 }

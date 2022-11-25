@@ -237,7 +237,7 @@ MonoBehaviour:
   walkingSpeed: 5
   runningSpeed: 7.5
   jumpSpeed: 8
-  gravity: 20
+  gravity: 16
   moveSmoothTime: 0.01
   lookSpeed: 2
   lookXLimit: 90

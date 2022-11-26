@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6588919553824288697}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Pistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 124740535018042161}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Grip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -77,7 +77,7 @@ GameObject:
   - component: {fileID: 124740535130448867}
   - component: {fileID: 124740535130448877}
   - component: {fileID: 124740535130448876}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,9 +169,9 @@ GameObject:
   - component: {fileID: -2776958652700574749}
   - component: {fileID: 2725252038686675284}
   - component: {fileID: 3133055491900540427}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -383,7 +383,7 @@ GameObject:
   - component: {fileID: 124740535750356288}
   - component: {fileID: 124740535750356291}
   - component: {fileID: 124740535750356290}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Left Eye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -464,7 +464,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 124740536068971564}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Hands
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -498,7 +498,7 @@ GameObject:
   - component: {fileID: 124740536116869579}
   - component: {fileID: 124740536116869557}
   - component: {fileID: 124740536116869556}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Right Eye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -581,7 +581,7 @@ GameObject:
   - component: {fileID: 124740536513043939}
   - component: {fileID: 124740536513043949}
   - component: {fileID: 124740536513043948}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Mouth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -664,7 +664,7 @@ GameObject:
   - component: {fileID: 1367430007775952288}
   - component: {fileID: 4497931301769452918}
   - component: {fileID: 6385682860351765236}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Grip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -745,7 +745,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1388197800124222081}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: --------MUZZLE--------
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -778,7 +778,7 @@ GameObject:
   - component: {fileID: 2248355848428947369}
   - component: {fileID: 7549170695003073289}
   - component: {fileID: 8781247034490485754}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Slide
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -862,7 +862,7 @@ GameObject:
   - component: {fileID: 1543983071551020978}
   - component: {fileID: 1345511973017052593}
   - component: {fileID: 4836316810053605724}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -945,7 +945,7 @@ GameObject:
   - component: {fileID: 7131871295422023432}
   - component: {fileID: 1946732309393846678}
   - component: {fileID: 7926937135216487753}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1026,7 +1026,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6235473077595167853}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Pea Shooter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1060,7 +1060,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7753354309740959327}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: --------MUZZLE--------
   m_TagString: Untagged
   m_Icon: {fileID: 0}

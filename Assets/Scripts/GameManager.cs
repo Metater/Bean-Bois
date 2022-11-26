@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 /*
     Items will be deleted when client that last touched them disconnects, not good
+    Transfer authority back to server ^^^^^^^^^^^^^^^^^^^^ On disconnect
 */
 
 public class GameManager : MonoBehaviour
@@ -20,6 +21,7 @@ public class GameManager : MonoBehaviour
     public Rigidbody ball;
     public TMP_Text srbText;
     public Transform spectatorBoxTransform;
+    public TMP_Text text;
 
     #region Unity Callbacks
     private void Awake()
@@ -28,15 +30,6 @@ public class GameManager : MonoBehaviour
         ItemLookup = new();
 
         UpdateCursorVisibility();
-    }
-    private void FixedUpdate()
-    {
-        /*
-        foreach (var player in PlayerLookup.Refs)
-        {
-            print($"Player: {player.netId}");
-        }
-        */
     }
     private void Update()
     {

@@ -4,30 +4,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class JengaTowerSpawner : NetworkBehaviour
+public class ServerJengaTowerSpawner : NetworkBehaviour
 {
     private const float HalfBaseHeight = 4f;
     private const float JengaBlockHeight = 4f;
     private const float HalfJengaBlockHeight = JengaBlockHeight / 2f;
     private const float JengaBlockWidth = 8f;
     private const float JengaBlockSpacing = 1f / 4f;
+    private const int TowerLayerCount = 18;
 
+    public Transform blueBaseTransform;
+    public Transform redBaseTransform;
     [SerializeField] private JengaBlock jengaBlockPrefab;
-    [SerializeField] private Transform baseTransform;
-    [SerializeField] private int layerCount;
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            SpawnTower(baseTransform.position);
-        }
-    }
 
     [Server]
-    public List<JengaBlock> SpawnTower(Vector3 basePosition)
+    public (List<JengaBlock> blocks, Vector3 spawnPosition) SpawnTower(Vector3 basePosition)
     {
-        List<JengaBlock> tower = new();
+        List<JengaBlock> blocks = new();
 
         float xPosition = basePosition.x;
         float GetYPosition(int layer) => (basePosition.y + HalfBaseHeight + HalfJengaBlockHeight) + (JengaBlockHeight * (float)layer);
@@ -62,16 +55,16 @@ public class JengaTowerSpawner : NetworkBehaviour
         }
         Quaternion GetRotation(int layer) => layer % 2 == 0 ? Quaternion.identity : Quaternion.Euler(0, 90, 0);
 
-        for (int layer = 0; layer < layerCount; layer++)
+        for (int layer = 0; layer < TowerLayerCount; layer++)
         {
             for (int block = 0; block < 3; block++)
             {
                 JengaBlock jengaBlock = Instantiate(jengaBlockPrefab, GetPosition(block, layer), GetRotation(layer));
                 NetworkServer.Spawn(jengaBlock.gameObject);
-                tower.Add(jengaBlock);
+                blocks.Add(jengaBlock);
             }
         }
 
-        return tower;
+        return (blocks, GetPosition(1, TowerLayerCount + 1));
     }
 }

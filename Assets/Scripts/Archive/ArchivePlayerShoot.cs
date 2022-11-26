@@ -105,7 +105,7 @@ public class ArchivePlayerShoot : NetworkBehaviour
     [ClientRpc]
     public void RpcHitPlayer(uint netId, Vector3 a, Vector3 bLocalPositionOnPlayer, Vector3 hitNormal)
     {
-        // TODO FindObjects bad???
+        // FindObjects bad???
         foreach (var player in FindObjectsOfType<ArchivePlayerShoot>())
         {
             if (player.netId == netId)

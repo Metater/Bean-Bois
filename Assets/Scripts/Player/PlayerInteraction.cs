@@ -15,7 +15,7 @@ public class PlayerInteraction : NetworkBehaviour, Player.IPlayerCallbacks
     [SerializeField] private Transform gripTransform;
     [Header("Interaction")]
     [SerializeField] private float reachDistance;
-    // TODO item should be smoothed relative to player body position???
+    // item should be smoothed relative to player body position???
     [SerializeField] private float itemSmoothTime;
     [SerializeField] private float itemRotationSlerpMultiplier;
     private Item[] slots;
@@ -33,10 +33,12 @@ public class PlayerInteraction : NetworkBehaviour, Player.IPlayerCallbacks
 
         slots = new Item[3];
     }
+
     public void PlayerStart()
     {
         
     }
+
     public void PlayerUpdate()
     {
         if (!isLocalPlayer)
@@ -81,6 +83,11 @@ public class PlayerInteraction : NetworkBehaviour, Player.IPlayerCallbacks
             Quaternion rotation = Quaternion.Slerp(item.transform.rotation, gripTransform.rotation, Time.deltaTime * itemRotationSlerpMultiplier);
             item.transform.SetPositionAndRotation(position, rotation);
         }
+    }
+
+    public void PlayerResetState()
+    {
+        
     }
     #endregion Player Callbacks
 

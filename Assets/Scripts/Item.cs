@@ -27,7 +27,7 @@ public abstract class Item : NetworkBehaviour
     #region Mirror Callbacks
     public override void OnStartClient()
     {
-        if (!isServer)
+        if (isClientOnly)
         {
             manager.ItemLookup.TryAdd(netId, this);
         }
@@ -38,7 +38,7 @@ public abstract class Item : NetworkBehaviour
     }
     public override void OnStopClient()
     {
-        if (!isServer)
+        if (isClientOnly)
         {
             manager.ItemLookup.TryRemoveWithNetId(netId, out _);
         }

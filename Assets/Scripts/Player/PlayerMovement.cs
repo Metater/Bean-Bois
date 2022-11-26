@@ -11,8 +11,6 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
     private GameManager manager;
     [SerializeField] private Player player;
     [SerializeField] private CharacterController controller;
-    private bool isSpectating = false;
-    private bool isInSpectatorBox = false;
     [Header("Transforms")]
     [SerializeField] private Transform handsTransform;
     [Header("Move")]
@@ -26,7 +24,7 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
     private float moveY = 0;
     private float moveXSmoothVelocity = 0;
     private float moveYSmoothVelocity = 0;
-    private bool wasGrounded = true;
+    private bool controllerWasGrounded = true;
     [Header("Look")]
     [SerializeField] private float lookSpeed;
     [SerializeField] private float lookXLimit;
@@ -65,12 +63,18 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
 
         if (transform.position.y < 0)
         {
-            isSpectating = true;
+            player.Spectate();
         }
 
         UpdateVelocityCalculation();
         UpdateMovementVectors();
         UpdateMovement();
+    }
+
+    public void PlayerResetState()
+    {
+        isSrbAvailable = true;
+        manager.srbText.gameObject.SetActive(true);
     }
     #endregion Player Callbacks
 
@@ -90,6 +94,7 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
         }
         Velocity /= velocities.Count;
     }
+
     private void UpdateMovementVectors()
     {
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
@@ -100,6 +105,7 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
         moveX = Mathf.SmoothDamp(lastMoveX, moveX, ref moveXSmoothVelocity, moveSmoothTime);
         moveY = Mathf.SmoothDamp(lastMoveY, moveY, ref moveYSmoothVelocity, moveSmoothTime);
     }
+
     private void UpdateMovement()
     {
         Vector3 forward = transform.TransformDirection(Vector3.forward);
@@ -122,7 +128,7 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
             {
                 isSrbAvailable = false;
                 srbStopTime = Time.timeAsDouble + srbBurnTime;
-                manager.srbText.text = "";
+                manager.srbText.gameObject.SetActive(false);
             }
         }
         else if (srbStopTime > Time.timeAsDouble)
@@ -133,7 +139,7 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
         Vector3 moveDelta = moveVelocity * Time.deltaTime;
         controller.Move(moveDelta);
 
-        if (wasGrounded && !controller.isGrounded && moveVelocity.y < 0)
+        if (controllerWasGrounded && !controller.isGrounded && moveVelocity.y < 0)
             moveVelocity.y = 0;
 
         rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
@@ -145,34 +151,47 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
 
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
 
-        // Teleport to center if you fall off of the map
-        if (transform.position.y < -25)
-        {
-            // TODO May need to do networkTransform.CmdTeleport instead, to avoid lerp?
-            transform.position = new Vector3(0, 25, 0);
-            moveVelocity.y = 0f;
-        }
-
-        if (isSpectating && !isInSpectatorBox)
-        {
-            transform.position = manager.spectatorBoxTransform.position;
-            moveVelocity = Vector3.zero;
-            isInSpectatorBox = true;
-        }
-
-        wasGrounded = controller.isGrounded;
+        controllerWasGrounded = controller.isGrounded;
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (!isLocalPlayer || isSpectating)
+        if (!isLocalPlayer || player.IsSpectating)
         {
             return;
         }
 
-        if (hit.gameObject.CompareTag("Lava") || hit.gameObject.CompareTag("Base"))
+        if (hit.gameObject.CompareTag("Lava") ||
+            hit.gameObject.CompareTag("Base") ||
+            hit.gameObject.CompareTag("SpectatorBox"))
         {
-            isSpectating = true;
+            player.Spectate();
         }
     }
+
+    #region Teleport
+    public void GeneralTeleport(Vector3 position)
+    {
+        if (isLocalPlayer)
+        {
+            Teleport(position);
+        }
+        else if (isServer)
+        {
+            RpcTeleport(position);
+        }
+    }
+    [ClientRpc]
+    public void RpcTeleport(Vector3 position)
+    {
+        Teleport(position);
+    }
+    private void Teleport(Vector3 position)
+    {
+        moveVelocity = Vector3.zero;
+        controller.enabled = false;
+        controller.transform.position = position;
+        controller.enabled = true;
+    }
+    #endregion Teleport
 }

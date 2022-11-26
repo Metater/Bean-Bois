@@ -7,22 +7,23 @@ public class JengaBlock : NetworkBehaviour
 {
     private void Update()
     {
-        if (!isServer)
+        if (isServer && transform.position.y < 0)
         {
-            return;
-        }
-
-        if (transform.position.y < 0)
-        {
-            NetworkServer.Destroy(gameObject);
+            NetworkDestroy();
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (isServer && collision.gameObject.CompareTag("Lava"))
+        if (isServer && (collision.gameObject.CompareTag("Lava") || collision.gameObject.CompareTag("SpectatorBox")))
         {
-            NetworkServer.Destroy(gameObject);
+            NetworkDestroy();
         }
+    }
+
+    [Server]
+    public void NetworkDestroy()
+    {
+        NetworkServer.Destroy(gameObject);
     }
 }

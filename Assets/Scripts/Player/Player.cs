@@ -15,6 +15,9 @@ public class Player : NetworkBehaviour
     [SerializeField] private List<GameObject> invisibleToSelf;
     [SerializeField] private float ballThrowSpeed;
     [SerializeField] private float ballThrowDistance;
+    [SyncVar(hook = nameof(OnTextChange))] public string text = "";
+    // TODO MAKE IS SPECTATING A SYNC VAR, ONE SOURCE OF TRUTH, have CmdSpecate, clients call, when hit lava or other deadly stuff
+    public bool IsSpectating { get; set; } = true;
     #endregion Fields
 
     #region Unity Callbacks
@@ -35,6 +38,7 @@ public class Player : NetworkBehaviour
         playerMovement.PlayerUpdate();
         playerInteraction.PlayerUpdate();
 
+        // TODO remove
         if (Input.GetMouseButtonDown(2))
         {
             Camera camera = Camera.main;
@@ -59,7 +63,7 @@ public class Player : NetworkBehaviour
     }
     public override void OnStartClient()
     {
-        if (!isServer)
+        if (isClientOnly)
         {
             manager.PlayerLookup.TryAdd(netId, this);
         }
@@ -77,7 +81,7 @@ public class Player : NetworkBehaviour
     }
     public override void OnStopClient()
     {
-        if (!isServer)
+        if (isClientOnly)
         {
             manager.PlayerLookup.TryRemoveWithNetId(netId, out _);
         }
@@ -93,8 +97,33 @@ public class Player : NetworkBehaviour
         public void PlayerAwake();
         public void PlayerStart();
         public void PlayerUpdate();
+        public void PlayerResetState();
     }
 
+    public void ResetState()
+    {
+        playerMovement.PlayerResetState();
+        playerInteraction.PlayerResetState();
+    }
+
+    public void Spectate()
+    {
+        if (!IsSpectating)
+        {
+            IsSpectating = true;
+            playerMovement.GeneralTeleport(manager.spectatorBoxTransform.position);
+        }
+    }
+    public void Spawn(Vector3 spawnPosition)
+    {
+        if (IsSpectating)
+        {
+            IsSpectating = false;
+            playerMovement.GeneralTeleport(spawnPosition);
+        }
+    }
+
+    // TODO remove
     [Command(requiresAuthority = false)]
     public void CmdThrowBall(Vector3 position, Vector3 direction)
     {
@@ -104,5 +133,10 @@ public class Player : NetworkBehaviour
         manager.ball.position = position;
 
         manager.ball.AddForce(direction.normalized * ballThrowSpeed, ForceMode.VelocityChange);
+    }
+
+    private void OnTextChange(string _, string newText)
+    {
+        manager.text.text = newText;
     }
 }

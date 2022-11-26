@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MaterialScroll : MonoBehaviour
+public class MaterialScroller : MonoBehaviour
 {
     [SerializeField] private Material scrollMaterial;
     [SerializeField] private Vector2 scrollVelocity;

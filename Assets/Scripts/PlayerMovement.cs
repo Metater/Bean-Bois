@@ -1,6 +1,7 @@
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
@@ -10,6 +11,8 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
     private GameManager manager;
     [SerializeField] private Player player;
     [SerializeField] private CharacterController controller;
+    private bool isSpectating = false;
+    private bool isInSpectatorBox = false;
     [Header("Transforms")]
     [SerializeField] private Transform handsTransform;
     [Header("Move")]
@@ -33,6 +36,11 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
     private Vector3 lastPosition = Vector3.zero;
     public Vector3 Velocity { get; private set; } = Vector3.zero;
     private Queue<Vector3> velocities;
+    [Header("SRB")]
+    [SerializeField] private double srbSpeed;
+    [SerializeField] private double srbBurnTime;
+    private bool isSrbAvailable = true;
+    private double srbStopTime;
     #endregion Fields
 
     #region Player Callbacks
@@ -53,6 +61,11 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
         if (!isLocalPlayer)
         {
             return;
+        }
+
+        if (transform.position.y < 0)
+        {
+            isSpectating = true;
         }
 
         UpdateVelocityCalculation();
@@ -103,6 +116,20 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
         if (!controller.isGrounded)
             moveVelocity.y -= gravity * Time.deltaTime;
 
+        if (isSrbAvailable)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                isSrbAvailable = false;
+                srbStopTime = Time.timeAsDouble + srbBurnTime;
+                manager.srbText.text = "";
+            }
+        }
+        else if (srbStopTime > Time.timeAsDouble)
+        {
+            moveVelocity.y += (float)(gravity + srbSpeed) * Time.deltaTime;
+        }
+
         Vector3 moveDelta = moveVelocity * Time.deltaTime;
         controller.Move(moveDelta);
 
@@ -126,6 +153,26 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
             moveVelocity.y = 0f;
         }
 
+        if (isSpectating && !isInSpectatorBox)
+        {
+            transform.position = manager.spectatorBoxTransform.position;
+            moveVelocity = Vector3.zero;
+            isInSpectatorBox = true;
+        }
+
         wasGrounded = controller.isGrounded;
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (!isLocalPlayer || isSpectating)
+        {
+            return;
+        }
+
+        if (hit.gameObject.CompareTag("Lava") || hit.gameObject.CompareTag("Base"))
+        {
+            isSpectating = true;
+        }
     }
 }

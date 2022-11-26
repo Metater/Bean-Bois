@@ -15,13 +15,14 @@ public class GameManager : MonoBehaviour
     public Player LocalPlayer { get; private set; }
     public NetRefLookup<Player> PlayerLookup { get; private set; }
     public NetRefLookup<Item> ItemLookup { get; private set; }
-    private bool isCursorVisible = true;
+    public bool IsCursorVisable { get; private set; } = true;
     public Image crosshairImage;
     public Transform generalTransform;
     public Rigidbody ball;
     public TMP_Text srbText;
     public Transform spectatorBoxTransform;
     public TMP_Text text;
+    public TMP_Text escapeVisibilityText;
 
     #region Unity Callbacks
     private void Awake()
@@ -35,7 +36,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            isCursorVisible = !isCursorVisible;
+            IsCursorVisable = !IsCursorVisable;
             UpdateCursorVisibility();
         }
     }
@@ -61,7 +62,7 @@ public class GameManager : MonoBehaviour
 
     private void UpdateCursorVisibility()
     {
-        if (isCursorVisible)
+        if (IsCursorVisable)
         {
             Cursor.lockState = CursorLockMode.None;
         }
@@ -69,6 +70,7 @@ public class GameManager : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
-        Cursor.visible = isCursorVisible;
+        Cursor.visible = IsCursorVisable;
+        escapeVisibilityText.gameObject.SetActive(IsCursorVisable);
     }
 }

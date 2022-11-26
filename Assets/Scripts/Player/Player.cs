@@ -1,8 +1,9 @@
 using Mirror;
 using Mirror.Examples.Benchmark;
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using TMPro;
 using UnityEngine;
 
 public class Player : NetworkBehaviour
@@ -15,7 +16,15 @@ public class Player : NetworkBehaviour
     [SerializeField] private List<GameObject> invisibleToSelf;
     [SerializeField] private float ballThrowSpeed;
     [SerializeField] private float ballThrowDistance;
-    [SyncVar(hook = nameof(OnTextChange))] public string text = "";
+    [SerializeField] private TMP_Text usernameText;
+    [SerializeField] private MeshRenderer bodyMeshRenderer;
+
+    [SyncVar(hook = nameof(OnBodyColorChange))]
+    public Color bodyColor = Color.white;
+    [SyncVar(hook = nameof(OnUsernameChange))]
+    public string username = "";
+    [SyncVar(hook = nameof(OnTextChange))]
+    public string text = "";
     // TODO MAKE IS SPECTATING A SYNC VAR, ONE SOURCE OF TRUTH, have CmdSpecate, clients call, when hit lava or other deadly stuff
     public bool IsSpectating { get; set; } = true;
     #endregion Fields
@@ -123,6 +132,16 @@ public class Player : NetworkBehaviour
         }
     }
 
+    public void SetUsername(string newUsername)
+    {
+        CmdSetUsername(newUsername);
+    }
+
+    public void SetBodyColor(Color newBodyColor)
+    {
+        CmdSetBodyColor(newBodyColor);
+    }
+
     // TODO remove
     [Command(requiresAuthority = false)]
     public void CmdThrowBall(Vector3 position, Vector3 direction)
@@ -133,6 +152,43 @@ public class Player : NetworkBehaviour
         manager.ball.position = position;
 
         manager.ball.AddForce(direction.normalized * ballThrowSpeed, ForceMode.VelocityChange);
+    }
+
+    [Command]
+    public void CmdSetUsername(string newUsername)
+    {
+        string usernameUntruncated = Regex.Replace(newUsername, @"[^a-zA-Z0-9\s]", string.Empty).Trim();
+        if (usernameUntruncated.Length > 16)
+        {
+            usernameUntruncated = usernameUntruncated[..16];
+        }
+        username = usernameUntruncated;
+    }
+
+    private void OnUsernameChange(string _, string newUsername)
+    {
+        if (isLocalPlayer)
+        {
+            return;
+        }
+
+        usernameText.text = newUsername;
+    }
+
+    [Command]
+    public void CmdSetBodyColor(Color newBodyColor)
+    {
+        bodyColor = newBodyColor;
+    }
+
+    private void OnBodyColorChange(Color _, Color newBodyColor)
+    {
+        if (isLocalPlayer)
+        {
+            return;
+        }
+
+        bodyMeshRenderer.material.color = newBodyColor;
     }
 
     private void OnTextChange(string _, string newText)

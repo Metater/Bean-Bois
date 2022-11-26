@@ -17,6 +17,37 @@ public class ServerJengaTowerSpawner : NetworkBehaviour
     public Transform redBaseTransform;
     [SerializeField] private JengaBlock jengaBlockPrefab;
 
+    private void Update()
+    {
+        EasterEgg();
+    }
+
+    #region Easter Egg
+    private readonly List<JengaBlock> easterEggBlocks = new();
+    [Server]
+    private void EasterEgg()
+    {
+        if (Input.GetKeyDown(KeyCode.KeypadDivide))
+        {
+            var blueBlocks = SpawnTower(blueBaseTransform.position).blocks;
+            var redBlocks = SpawnTower(redBaseTransform.position).blocks;
+            easterEggBlocks.AddRange(blueBlocks);
+            easterEggBlocks.AddRange(redBlocks);
+        }
+        if (Input.GetKeyDown(KeyCode.KeypadMultiply))
+        {
+            foreach (var block in easterEggBlocks)
+            {
+                if (block is not null)
+                {
+                    block.NetworkDestroy();
+                }
+            }
+            easterEggBlocks.Clear();
+        }
+    }
+    #endregion Easter Egg
+
     [Server]
     public (List<JengaBlock> blocks, Vector3 spawnPosition) SpawnTower(Vector3 basePosition)
     {

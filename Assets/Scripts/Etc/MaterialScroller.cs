@@ -14,4 +14,9 @@ public class MaterialScroller : MonoBehaviour
         scrollMaterial.mainTextureOffset = scrollPosition;
         scrollPosition += scrollVelocity * Time.deltaTime;
     }
+
+    private void OnApplicationQuit()
+    {
+        scrollMaterial.mainTextureOffset = Vector2.zero;
+    }
 }

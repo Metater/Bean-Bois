@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class ServerRoundManager : NetworkBehaviour
 {
-    private const float WaitingPeriod = 5; // seconds
+    private const float WaitingPeriod = 60; // seconds
 
     private ServerManager server;
     private GameManager manager;

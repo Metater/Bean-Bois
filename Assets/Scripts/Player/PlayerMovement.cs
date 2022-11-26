@@ -122,18 +122,21 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
         if (!controller.isGrounded)
             moveVelocity.y -= gravity * Time.deltaTime;
 
-        if (isSrbAvailable)
+        if (!player.IsSpectating)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (isSrbAvailable)
             {
-                isSrbAvailable = false;
-                srbStopTime = Time.timeAsDouble + srbBurnTime;
-                manager.srbText.gameObject.SetActive(false);
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    isSrbAvailable = false;
+                    srbStopTime = Time.timeAsDouble + srbBurnTime;
+                    manager.srbText.gameObject.SetActive(false);
+                }
             }
-        }
-        else if (srbStopTime > Time.timeAsDouble)
-        {
-            moveVelocity.y += (float)(gravity + srbSpeed) * Time.deltaTime;
+            else if (srbStopTime > Time.timeAsDouble)
+            {
+                moveVelocity.y += (float)(gravity + srbSpeed) * Time.deltaTime;
+            }
         }
 
         Vector3 moveDelta = moveVelocity * Time.deltaTime;
@@ -142,14 +145,17 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
         if (controllerWasGrounded && !controller.isGrounded && moveVelocity.y < 0)
             moveVelocity.y = 0;
 
-        rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
-        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+        if (!manager.IsCursorVisable)
+        {
+            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
 
-        Quaternion rotation = Quaternion.Euler(rotationX, 0, 0);
-        Camera.main.transform.localRotation = rotation;
-        handsTransform.transform.localRotation = rotation;
+            Quaternion rotation = Quaternion.Euler(rotationX, 0, 0);
+            Camera.main.transform.localRotation = rotation;
+            handsTransform.transform.localRotation = rotation;
 
-        transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+        }
 
         controllerWasGrounded = controller.isGrounded;
     }

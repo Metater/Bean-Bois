@@ -164,6 +164,7 @@ GameObject:
   - component: {fileID: -8637209812853527664}
   - component: {fileID: -4002994996597634760}
   - component: {fileID: 1624441774866576565}
+  - component: {fileID: 9034805610833963412}
   - component: {fileID: 7734917177985079050}
   - component: {fileID: -2777430846514871914}
   - component: {fileID: -2776958652700574749}
@@ -209,8 +210,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
-  playerMovement: {fileID: -4002994996597634760}
-  playerInteraction: {fileID: 1624441774866576565}
+  movement: {fileID: -4002994996597634760}
+  interaction: {fileID: 1624441774866576565}
+  configurables: {fileID: 9034805610833963412}
   invisibleToSelf:
   - {fileID: 124740535750356295}
   - {fileID: 124740536116869578}
@@ -218,11 +220,6 @@ MonoBehaviour:
   - {fileID: 7673350064727772092}
   ballThrowSpeed: 100
   ballThrowDistance: 2
-  usernameText: {fileID: 6893727883813230104}
-  bodyMeshRenderer: {fileID: 124740535130448876}
-  bodyColor: {r: 1, g: 1, b: 1, a: 1}
-  username: 
-  text: 
 --- !u!114 &-4002994996597634760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,6 +271,26 @@ MonoBehaviour:
   selectedSlotSynced: 0
   crosshairDefaultColor: {r: 1, g: 1, b: 1, a: 0.49803922}
   crosshairHoverItemColor: {r: 0.20392157, g: 0.5647059, b: 0.8117647, a: 0.49803922}
+--- !u!114 &9034805610833963412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124740535598638578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a07509a95f4a5194b9a5232bffce43c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  usernameText: {fileID: 6893727883813230104}
+  bodyMeshRenderer: {fileID: 124740535130448876}
+  bodyColor: {r: 1, g: 1, b: 1, a: 1}
+  username: 
+  mainText: 
 --- !u!114 &7734917177985079050
 MonoBehaviour:
   m_ObjectHideFlags: 0

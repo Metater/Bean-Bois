@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInteraction : NetworkBehaviour, Player.IPlayerCallbacks
+public class PlayerInteraction : NetworkBehaviour, IPlayerCallbacks
 {
     public const int SlotCount = 3;
 
@@ -33,12 +33,10 @@ public class PlayerInteraction : NetworkBehaviour, Player.IPlayerCallbacks
 
         slots = new Item[3];
     }
-
     public void PlayerStart()
     {
         
     }
-
     public void PlayerUpdate()
     {
         if (!isLocalPlayer)
@@ -49,7 +47,7 @@ public class PlayerInteraction : NetworkBehaviour, Player.IPlayerCallbacks
         Item selectedItem = slots[selectedSlotLocal];
         Color crosshairColor = crosshairDefaultColor;
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        if (selectedItem is null && Physics.Raycast(ray, out var hit, reachDistance))
+        if (selectedItem == null && Physics.Raycast(ray, out var hit, reachDistance))
         {
             if (hit.transform.gameObject.TryGetComponent<Item>(out var item) && !item.IsPickedUp)
             {
@@ -64,17 +62,17 @@ public class PlayerInteraction : NetworkBehaviour, Player.IPlayerCallbacks
 
         UpdateSlot();
 
-        if (selectedItem is not null)
+        if (selectedItem != null)
         {
             if (Input.GetKeyDown(KeyCode.G) && selectedSlotLocal == selectedSlotSynced)
             {
-                CmdDropItem(selectedItem.netId, Camera.main.transform.forward, player.playerMovement.Velocity);
+                CmdDropItem(selectedItem.netId, Camera.main.transform.forward, player.movement.Velocity);
             }
         }
 
         foreach (var item in slots)
         {
-            if (item is null || !item.isOwned)
+            if (item == null || !item.isOwned)
             {
                 continue;
             }
@@ -84,7 +82,10 @@ public class PlayerInteraction : NetworkBehaviour, Player.IPlayerCallbacks
             item.transform.SetPositionAndRotation(position, rotation);
         }
     }
+    public void PlayerLateUpdate()
+    {
 
+    }
     public void PlayerResetState()
     {
         
@@ -166,10 +167,10 @@ public class PlayerInteraction : NetworkBehaviour, Player.IPlayerCallbacks
         if (manager.ItemLookup.TryGetWithNetId(netId, out var item) && !item.IsPickedUp)
         {
             int slot = selectedSlotSynced;
-            if (slots[slot] is null)
+            if (slots[slot] == null)
             {
                 // Unnessarily removes and reassigns client authority when client picks up same item >= 2 times in a row
-                if (item.netIdentity.connectionToClient is not null)
+                if (item.netIdentity.connectionToClient != null)
                 {
                     item.netIdentity.RemoveClientAuthority();
                 }
@@ -214,7 +215,7 @@ public class PlayerInteraction : NetworkBehaviour, Player.IPlayerCallbacks
             for (int i = 0; i < 3; i++)
             {
                 Item slot = slots[i];
-                if (slot is null)
+                if (slot == null)
                 {
                     continue;
                 }

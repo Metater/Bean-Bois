@@ -2,7 +2,6 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Telepathy;
 using UnityEngine;
 
 public class ServerRoundManager : NetworkBehaviour
@@ -20,32 +19,23 @@ public class ServerRoundManager : NetworkBehaviour
 
     private float waitTimeRemaining = WaitingPeriod;
 
-    // Players can disappear at anytime, blocks can disappear at anytime, they can be destroyed
-
     private void Awake()
     {
         server = FindObjectOfType<ServerManager>(true);
         manager = FindObjectOfType<GameManager>(true);
     }
 
-    public override void OnStartServer()
-    {
-        //jengaTowerSpawner.SpawnTower(jengaTowerSpawner.blueBaseTransform.position).blocks;
-    }
-
     private void Update()
     {
-        blueTower.blocks.RemoveAll(b => b is null);
-        bluePlayers.RemoveAll(p => p is null);
-        redPlayers.RemoveAll(p => p is null);
-        redTower.blocks.RemoveAll(b => b is null);
-
-        // On start: player.PlayerResetState
+        CleanupNull();
 
         if (IsRoundInProgress())
         {
             waitTimeRemaining = WaitingPeriod;
-            server.SetText("");
+            server.SetMainText("");
+            // Set text for what team is going
+            // Who on the team is going
+            // And time remaining for that turn
         }
         else
         {
@@ -57,12 +47,12 @@ public class ServerRoundManager : NetworkBehaviour
             if (manager.PlayerLookup.Refs.Count() < 2)
             {
                 waitTimeRemaining = WaitingPeriod;
-                server.SetText("Waiting for more players...");
+                server.SetMainText("Waiting for more players...");
             }
             else
             {
                 waitTimeRemaining -= Time.deltaTime;
-                server.SetText($"Starting in {Mathf.RoundToInt(waitTimeRemaining)} seconds!");
+                server.SetMainText($"Starting in {Mathf.RoundToInt(waitTimeRemaining)} seconds!");
                 if (waitTimeRemaining <= 0)
                 {
                     CleanupPreviousRound();
@@ -72,16 +62,24 @@ public class ServerRoundManager : NetworkBehaviour
         }
     }
 
-    [Server]
+    private void CleanupNull()
+    {
+        blueTower.blocks.RemoveAll(b => b == null);
+        bluePlayers.RemoveAll(p => p == null);
+        redPlayers.RemoveAll(p => p == null);
+        redTower.blocks.RemoveAll(b => b == null);
+    }
+
     private void CleanupPreviousRound()
     {
+        CleanupNull();
+
         blueTower.blocks.ForEach(b => b.NetworkDestroy());
         bluePlayers.Clear();
         redTower.blocks.ForEach(b => b.NetworkDestroy());
         redPlayers.Clear();
     }
 
-    [Server]
     private void StartRound()
     {
         blueTower = jengaTowerSpawner.SpawnTower(jengaTowerSpawner.blueBaseTransform.position);
@@ -109,7 +107,6 @@ public class ServerRoundManager : NetworkBehaviour
         }
     }
 
-    [Server]
     private bool IsRoundInProgress()
     {
         bool someBlocksOnBothTeams = blueTower.blocks.Count != 0 && redTower.blocks.Count != 0;

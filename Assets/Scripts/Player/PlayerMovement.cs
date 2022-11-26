@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 
-public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
+public class PlayerMovement : NetworkBehaviour, IPlayerCallbacks
 {
     #region Fields
     [Header("General")]
@@ -48,12 +48,10 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
 
         velocities = new();
     }
-
     public void PlayerStart()
     {
         lastPosition = transform.position;
     }
-
     public void PlayerUpdate()
     {
         if (!isLocalPlayer)
@@ -70,7 +68,10 @@ public class PlayerMovement : NetworkBehaviour, Player.IPlayerCallbacks
         UpdateMovementVectors();
         UpdateMovement();
     }
+    public void PlayerLateUpdate()
+    {
 
+    }
     public void PlayerResetState()
     {
         isSrbAvailable = true;

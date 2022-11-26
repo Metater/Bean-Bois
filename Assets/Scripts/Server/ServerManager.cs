@@ -13,11 +13,11 @@ public class ServerManager : NetworkBehaviour
     }
 
     [Server]
-    public void SetText(string text)
+    public void SetMainText(string newMainText)
     {
         foreach (var player in manager.PlayerLookup.Refs)
         {
-            player.text = text;
+            player.configurables.mainText = newMainText;
         }
     }
 }

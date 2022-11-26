@@ -9,24 +9,20 @@ using UnityEngine;
 public class Player : NetworkBehaviour
 {
     #region Fields
-    [Header("General")]
     private GameManager manager;
-    public PlayerMovement playerMovement;
-    public PlayerInteraction playerInteraction;
+
+    [Header("General")]
+    public PlayerMovement movement;
+    public PlayerInteraction interaction;
+    public PlayerConfigurables configurables;
+
     [SerializeField] private List<GameObject> invisibleToSelf;
+
     [SerializeField] private float ballThrowSpeed;
     [SerializeField] private float ballThrowDistance;
-    [SerializeField] private TMP_Text usernameText;
-    [SerializeField] private MeshRenderer bodyMeshRenderer;
 
-    [SyncVar(hook = nameof(OnBodyColorChange))]
-    public Color bodyColor = Color.white;
-    [SyncVar(hook = nameof(OnUsernameChange))]
-    public string username = "";
-    [SyncVar(hook = nameof(OnTextChange))]
-    public string text = "";
-    // TODO MAKE IS SPECTATING A SYNC VAR, ONE SOURCE OF TRUTH, have CmdSpecate, clients call, when hit lava or other deadly stuff
-    public bool IsSpectating { get; set; } = true;
+    [SyncVar]
+    public bool isSpectating = true;
     #endregion Fields
 
     #region Unity Callbacks
@@ -34,18 +30,21 @@ public class Player : NetworkBehaviour
     {
         manager = FindObjectOfType<GameManager>(true);
 
-        playerMovement.PlayerAwake();
-        playerInteraction.PlayerAwake();
+        movement.PlayerAwake();
+        interaction.PlayerAwake();
+        configurables.PlayerAwake();
     }
     private void Start()
     {
-        playerMovement.PlayerStart();
-        playerInteraction.PlayerStart();
+        movement.PlayerStart();
+        interaction.PlayerStart();
+        configurables.PlayerStart();
     }
     private void Update()
     {
-        playerMovement.PlayerUpdate();
-        playerInteraction.PlayerUpdate();
+        movement.PlayerUpdate();
+        interaction.PlayerUpdate();
+        configurables.PlayerUpdate();
 
         // TODO remove
         if (Input.GetMouseButtonDown(2))
@@ -55,6 +54,12 @@ public class Player : NetworkBehaviour
             Vector3 direction = camera.transform.forward;
             CmdThrowBall(position + (direction * ballThrowDistance), direction);
         }
+    }
+    private void LateUpdate()
+    {
+        movement.PlayerLateUpdate();
+        interaction.PlayerLateUpdate();
+        configurables.PlayerLateUpdate();
     }
     #endregion Unity Callbacks
 
@@ -101,18 +106,11 @@ public class Player : NetworkBehaviour
     }
     #endregion Mirror Callbacks
 
-    public interface IPlayerCallbacks
-    {
-        public void PlayerAwake();
-        public void PlayerStart();
-        public void PlayerUpdate();
-        public void PlayerResetState();
-    }
-
     public void ResetState()
     {
-        playerMovement.PlayerResetState();
-        playerInteraction.PlayerResetState();
+        movement.PlayerResetState();
+        interaction.PlayerResetState();
+        configurables.PlayerResetState();
     }
 
     public void Spectate()
@@ -120,29 +118,19 @@ public class Player : NetworkBehaviour
         if (!IsSpectating)
         {
             IsSpectating = true;
-            playerMovement.GeneralTeleport(manager.spectatorBoxTransform.position);
+            movement.GeneralTeleport(manager.spectatorBoxTransform.position);
         }
     }
+    [Server]
     public void Spawn(Vector3 spawnPosition)
     {
         if (IsSpectating)
         {
             IsSpectating = false;
-            playerMovement.GeneralTeleport(spawnPosition);
+            movement.GeneralTeleport(spawnPosition);
         }
     }
 
-    public void SetUsername(string newUsername)
-    {
-        CmdSetUsername(newUsername);
-    }
-
-    public void SetBodyColor(Color newBodyColor)
-    {
-        CmdSetBodyColor(newBodyColor);
-    }
-
-    // TODO remove
     [Command(requiresAuthority = false)]
     public void CmdThrowBall(Vector3 position, Vector3 direction)
     {
@@ -152,47 +140,5 @@ public class Player : NetworkBehaviour
         manager.ball.position = position;
 
         manager.ball.AddForce(direction.normalized * ballThrowSpeed, ForceMode.VelocityChange);
-    }
-
-    [Command]
-    public void CmdSetUsername(string newUsername)
-    {
-        string usernameUntruncated = Regex.Replace(newUsername, @"[^a-zA-Z0-9\s]", string.Empty).Trim();
-        if (usernameUntruncated.Length > 16)
-        {
-            usernameUntruncated = usernameUntruncated[..16];
-        }
-        username = usernameUntruncated;
-    }
-
-    private void OnUsernameChange(string _, string newUsername)
-    {
-        if (isLocalPlayer)
-        {
-            return;
-        }
-
-        usernameText.text = newUsername;
-    }
-
-    [Command]
-    public void CmdSetBodyColor(Color newBodyColor)
-    {
-        bodyColor = newBodyColor;
-    }
-
-    private void OnBodyColorChange(Color _, Color newBodyColor)
-    {
-        if (isLocalPlayer)
-        {
-            return;
-        }
-
-        bodyMeshRenderer.material.color = newBodyColor;
-    }
-
-    private void OnTextChange(string _, string newText)
-    {
-        manager.text.text = newText;
     }
 }

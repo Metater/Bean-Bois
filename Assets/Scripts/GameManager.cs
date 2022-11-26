@@ -12,21 +12,35 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    #region Fields
+    private UiManager ui;
+
     public Player LocalPlayer { get; private set; }
+    public bool IsLocalPlayerNull => LocalPlayer == null;
+
+    public bool IsCursorVisable { get; private set; } = true;
+
     public NetRefLookup<Player> PlayerLookup { get; private set; }
     public NetRefLookup<Item> ItemLookup { get; private set; }
-    public bool IsCursorVisable { get; private set; } = true;
+    #endregion Fields
+
+    #region References
     public Image crosshairImage;
-    public Transform generalTransform;
-    public Rigidbody ball;
+
+    public TMP_Text mainText;
     public TMP_Text srbText;
+
+    public Transform generalTransform;
     public Transform spectatorBoxTransform;
-    public TMP_Text text;
-    public TMP_Text escapeVisibilityText;
+
+    public Rigidbody ball;
+    #endregion References
 
     #region Unity Callbacks
     private void Awake()
     {
+        ui = FindObjectOfType<UiManager>(true);
+
         PlayerLookup = new();
         ItemLookup = new();
 
@@ -34,7 +48,7 @@ public class GameManager : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (!IsLocalPlayerNull && Input.GetKeyDown(KeyCode.Escape))
         {
             IsCursorVisable = !IsCursorVisable;
             UpdateCursorVisibility();
@@ -53,24 +67,23 @@ public class GameManager : MonoBehaviour
     }
     */
 
-    #region Reference Management
     public void SetLocalPlayer(Player localPlayer)
     {
         LocalPlayer = localPlayer;
+
+        if (IsLocalPlayerNull)
+        {
+            IsCursorVisable = true;
+            UpdateCursorVisibility();
+        }
+
+        ui.SetUiDisabled(IsLocalPlayerNull);
     }
-    #endregion Reference Management
 
     private void UpdateCursorVisibility()
     {
-        if (IsCursorVisable)
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
+        Cursor.lockState = IsCursorVisable ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = IsCursorVisable;
-        escapeVisibilityText.gameObject.SetActive(IsCursorVisable);
+        ui.ShowUi(IsCursorVisable);
     }
 }

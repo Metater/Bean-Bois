@@ -13,9 +13,11 @@ public class ServerJengaTowerSpawner : NetworkBehaviour
     private const float JengaBlockSpacing = 1f / 4f;
     private const int TowerLayerCount = 18;
 
+    #region Fields
     public Transform blueBaseTransform;
     public Transform redBaseTransform;
     [SerializeField] private JengaBlock jengaBlockPrefab;
+    #endregion Fields
 
     private void Update()
     {
@@ -24,7 +26,6 @@ public class ServerJengaTowerSpawner : NetworkBehaviour
 
     #region Easter Egg
     private readonly List<JengaBlock> easterEggBlocks = new();
-    [Server]
     private void EasterEgg()
     {
         if (Input.GetKeyDown(KeyCode.KeypadDivide))
@@ -38,7 +39,7 @@ public class ServerJengaTowerSpawner : NetworkBehaviour
         {
             foreach (var block in easterEggBlocks)
             {
-                if (block is not null)
+                if (block != null)
                 {
                     block.NetworkDestroy();
                 }
@@ -58,7 +59,7 @@ public class ServerJengaTowerSpawner : NetworkBehaviour
         float zPosition = basePosition.z;
         Vector3 GetPosition(int block, int layer)
         {
-            if (layer % 2 == 0) // z-axis spacing
+            if (layer % 2 == 0)
             {
                 switch (block)
                 {
@@ -70,7 +71,7 @@ public class ServerJengaTowerSpawner : NetworkBehaviour
                         return new(xPosition, GetYPosition(layer), zPosition + (JengaBlockWidth + JengaBlockSpacing));
                 }
             }
-            else // x-axis spacing
+            else
             {
                 switch (block)
                 {

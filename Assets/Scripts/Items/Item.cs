@@ -38,22 +38,33 @@ public abstract class Item : NetworkBehaviour
     }
     public override void OnStopClient()
     {
+        /*
+        foreach (var item in manager.ItemLookup.Refs)
+        {
+
+        }
+        */
+
         if (isClientOnly)
         {
+            print("bye bye client only");
+
             manager.ItemLookup.TryRemoveWithNetId(netId, out _);
         }
     }
     public override void OnStopServer()
     {
+        print("bye bye server");
+
         manager.ItemLookup.TryRemoveWithNetId(netId, out _);
     }
     public override void OnStartAuthority()
     {
-        
+        print("Start authority");
     }
     public override void OnStopAuthority()
     {
-        
+        print("Stop authority");
     }
     #endregion Mirror Callbacks
 

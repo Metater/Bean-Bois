@@ -49,16 +49,18 @@ public class NetworkUiConfigManager : NetworkBehaviour
         {
             if (!manager.IsLocalPlayerNull)
             {
+                PlayerConfigurables configurables = manager.LocalPlayer.Configurables;
+
                 string username = Username;
-                if (manager.LocalPlayer.configurables.username != username)
+                if (configurables.username != username)
                 {
-                    manager.LocalPlayer.configurables.CmdSetUsername(username);
+                    configurables.CmdSetUsername(username);
                 }
 
                 Color bodyColor = BodyColor;
-                if (manager.LocalPlayer.configurables.bodyColor != bodyColor)
+                if (configurables.bodyColor != bodyColor)
                 {
-                    manager.LocalPlayer.configurables.CmdSetBodyColor(bodyColor);
+                    configurables.CmdSetBodyColor(bodyColor);
                 }
             }
             yield return new WaitForSeconds(0.25f);

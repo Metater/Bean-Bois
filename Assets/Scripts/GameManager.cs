@@ -25,15 +25,7 @@ public class GameManager : MonoBehaviour
     #endregion Fields
 
     #region References
-    public Image crosshairImage;
 
-    public TMP_Text mainText;
-    public TMP_Text srbText;
-
-    public Transform generalTransform;
-    public Transform spectatorBoxTransform;
-
-    public Rigidbody ball;
     #endregion References
 
     #region Unity Callbacks

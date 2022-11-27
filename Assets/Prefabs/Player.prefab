@@ -209,10 +209,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncDirection: 0
   syncMode: 0
-  syncInterval: 0.1
-  movement: {fileID: -4002994996597634760}
-  interaction: {fileID: 1624441774866576565}
-  configurables: {fileID: 9034805610833963412}
+  syncInterval: 0
+  playerComponents:
+  - {fileID: -4002994996597634760}
+  - {fileID: 1624441774866576565}
+  - {fileID: 9034805610833963412}
   invisibleToSelf:
   - {fileID: 124740535750356295}
   - {fileID: 124740536116869578}
@@ -220,6 +221,7 @@ MonoBehaviour:
   - {fileID: 7673350064727772092}
   ballThrowSpeed: 100
   ballThrowDistance: 2
+  isSpectating: 1
 --- !u!114 &-4002994996597634760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -235,7 +237,6 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
-  player: {fileID: -8637209812853527664}
   controller: {fileID: 3133055491900540427}
   handsTransform: {fileID: 124740536068971564}
   walkingSpeed: 5
@@ -245,7 +246,6 @@ MonoBehaviour:
   moveSmoothTime: 0.01
   lookSpeed: 2
   lookXLimit: 90
-  velocityAveragingQueueSize: 3
   srbSpeed: 12
   srbBurnTime: 4
 --- !u!114 &1624441774866576565
@@ -263,7 +263,6 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  player: {fileID: -8637209812853527664}
   gripTransform: {fileID: 124740535018042161}
   reachDistance: 3
   itemSmoothTime: 0
@@ -287,10 +286,9 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   usernameText: {fileID: 6893727883813230104}
+  username: 
   bodyMeshRenderer: {fileID: 124740535130448876}
   bodyColor: {r: 1, g: 1, b: 1, a: 1}
-  username: 
-  mainText: 
 --- !u!114 &7734917177985079050
 MonoBehaviour:
   m_ObjectHideFlags: 0

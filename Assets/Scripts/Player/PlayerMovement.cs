@@ -4,15 +4,14 @@ using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 
-public class PlayerMovement : NetworkBehaviour, IPlayerCallbacks
+public class PlayerMovement : PlayerComponent
 {
-    #region Fields
     [Header("General")]
-    private GameManager manager;
-    [SerializeField] private Player player;
     [SerializeField] private CharacterController controller;
+
     [Header("Transforms")]
     [SerializeField] private Transform handsTransform;
+
     [Header("Move")]
     [SerializeField] private float walkingSpeed;
     [SerializeField] private float runningSpeed;
@@ -25,34 +24,20 @@ public class PlayerMovement : NetworkBehaviour, IPlayerCallbacks
     private float moveXSmoothVelocity = 0;
     private float moveYSmoothVelocity = 0;
     private bool controllerWasGrounded = true;
+
     [Header("Look")]
     [SerializeField] private float lookSpeed;
     [SerializeField] private float lookXLimit;
     private float rotationX = 0;
-    [Header("Velocity Calculation")]
-    [SerializeField] private int velocityAveragingQueueSize;
-    private Vector3 lastPosition = Vector3.zero;
-    public Vector3 Velocity { get; private set; } = Vector3.zero;
-    private Queue<Vector3> velocities;
+
     [Header("SRB")]
     [SerializeField] private double srbSpeed;
     [SerializeField] private double srbBurnTime;
     private bool isSrbAvailable = true;
     private double srbStopTime;
-    #endregion Fields
 
     #region Player Callbacks
-    public void PlayerAwake()
-    {
-        manager = FindObjectOfType<GameManager>(true);
-
-        velocities = new();
-    }
-    public void PlayerStart()
-    {
-        lastPosition = transform.position;
-    }
-    public void PlayerUpdate()
+    public override void PlayerUpdate()
     {
         if (!isLocalPlayer)
         {
@@ -61,40 +46,23 @@ public class PlayerMovement : NetworkBehaviour, IPlayerCallbacks
 
         if (transform.position.y < 0)
         {
-            player.Spectate();
+            player.CmdSpectate();
         }
 
-        UpdateVelocityCalculation();
         UpdateMovementVectors();
         UpdateMovement();
     }
-    public void PlayerLateUpdate()
+    public override void PlayerRoundInit()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
 
-    }
-    public void PlayerResetState()
-    {
         isSrbAvailable = true;
-        manager.srbText.gameObject.SetActive(true);
+        refs.srbAvailableText.gameObject.SetActive(true);
     }
     #endregion Player Callbacks
-
-    private void UpdateVelocityCalculation()
-    {
-        Vector3 rawVelocity = (transform.position - lastPosition) / Time.deltaTime;
-        lastPosition = transform.position;
-        velocities.Enqueue(rawVelocity);
-        while (velocities.Count > velocityAveragingQueueSize)
-        {
-            velocities.Dequeue();
-        }
-        Velocity = Vector3.zero;
-        foreach (Vector3 v in velocities)
-        {
-            Velocity += v;
-        }
-        Velocity /= velocities.Count;
-    }
 
     private void UpdateMovementVectors()
     {
@@ -106,46 +74,42 @@ public class PlayerMovement : NetworkBehaviour, IPlayerCallbacks
         moveX = Mathf.SmoothDamp(lastMoveX, moveX, ref moveXSmoothVelocity, moveSmoothTime);
         moveY = Mathf.SmoothDamp(lastMoveY, moveY, ref moveYSmoothVelocity, moveSmoothTime);
     }
-
     private void UpdateMovement()
     {
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 
+        // Stop movement when menu is open
+        if (manager.IsCursorVisable)
+        {
+            moveX = 0;
+            moveY = 0;
+        }
+
         float moveVelocityY = moveVelocity.y;
         moveVelocity = (forward * moveX) + (right * moveY);
 
-        if (controller.isGrounded && Input.GetButtonDown("Jump"))
+        // Allow jumps only when menu is closed and is grounded
+        if (!manager.IsCursorVisable && controller.isGrounded && Input.GetButtonDown("Jump"))
             moveVelocity.y = jumpSpeed;
-        else
+        else // Keep old y velocity
             moveVelocity.y = moveVelocityY;
 
+        // Apply gravity when not on ground
         if (!controller.isGrounded)
             moveVelocity.y -= gravity * Time.deltaTime;
 
-        if (!player.IsSpectating)
-        {
-            if (isSrbAvailable)
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    isSrbAvailable = false;
-                    srbStopTime = Time.timeAsDouble + srbBurnTime;
-                    manager.srbText.gameObject.SetActive(false);
-                }
-            }
-            else if (srbStopTime > Time.timeAsDouble)
-            {
-                moveVelocity.y += (float)(gravity + srbSpeed) * Time.deltaTime;
-            }
-        }
+        UpdateSrb();
 
+        // Apply move velocity to controller
         Vector3 moveDelta = moveVelocity * Time.deltaTime;
         controller.Move(moveDelta);
 
+        // If was grounded last update and isnt grounded now and falling down, cancel velocity
         if (controllerWasGrounded && !controller.isGrounded && moveVelocity.y < 0)
             moveVelocity.y = 0;
 
+        // Only allow looking when menu is closed
         if (!manager.IsCursorVisable)
         {
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
@@ -160,10 +124,31 @@ public class PlayerMovement : NetworkBehaviour, IPlayerCallbacks
 
         controllerWasGrounded = controller.isGrounded;
     }
+    private void UpdateSrb()
+    {
+        if (player.isSpectating || manager.IsCursorVisable)
+        {
+            return;
+        }
+
+        if (isSrbAvailable)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                isSrbAvailable = false;
+                srbStopTime = Time.timeAsDouble + srbBurnTime;
+                refs.srbAvailableText.gameObject.SetActive(false);
+            }
+        }
+        else if (srbStopTime > Time.timeAsDouble) // Srb still firing?
+        {
+            moveVelocity.y += (float)(gravity + srbSpeed) * Time.deltaTime;
+        }
+    }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (!isLocalPlayer || player.IsSpectating)
+        if (!isLocalPlayer || player.isSpectating)
         {
             return;
         }
@@ -172,8 +157,18 @@ public class PlayerMovement : NetworkBehaviour, IPlayerCallbacks
             hit.gameObject.CompareTag("Base") ||
             hit.gameObject.CompareTag("SpectatorBox"))
         {
-            player.Spectate();
+            player.CmdSpectate();
         }
+    }
+
+    public Vector3 GetCurrentVelocity()
+    {
+        Vector3 currentVelocity = moveVelocity;
+        if (controller.isGrounded)
+        {
+            currentVelocity.y = 0;
+        }
+        return currentVelocity;
     }
 
     #region Teleport
@@ -189,7 +184,7 @@ public class PlayerMovement : NetworkBehaviour, IPlayerCallbacks
         }
     }
     [ClientRpc]
-    public void RpcTeleport(Vector3 position)
+    private void RpcTeleport(Vector3 position)
     {
         Teleport(position);
     }

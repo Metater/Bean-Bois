@@ -6,23 +6,25 @@ using UnityEngine;
 
 public class ServerRoundManager : NetworkBehaviour
 {
-    private const float WaitingPeriod = 60; // seconds
-
-    private ServerManager server;
     private GameManager manager;
+    private NetworkUiManager networkUi;
+
     [SerializeField] private ServerJengaTowerSpawner jengaTowerSpawner;
+    [SerializeField] private float waitingPeriod;
 
     private (List<JengaBlock> blocks, Vector3 spawnPosition) blueTower = (new(), Vector3.zero);
     private readonly List<Player> bluePlayers = new();
     private (List<JengaBlock> blocks, Vector3 spawnPosition) redTower = (new(), Vector3.zero);
     private readonly List<Player> redPlayers = new();
 
-    private float waitTimeRemaining = WaitingPeriod;
+    private float waitTimeRemaining;
 
     private void Awake()
     {
-        server = FindObjectOfType<ServerManager>(true);
         manager = FindObjectOfType<GameManager>(true);
+        networkUi = FindObjectOfType<NetworkUiManager>(true);
+
+        waitTimeRemaining = waitingPeriod;
     }
 
     private void Update()
@@ -31,8 +33,8 @@ public class ServerRoundManager : NetworkBehaviour
 
         if (IsRoundInProgress())
         {
-            waitTimeRemaining = WaitingPeriod;
-            server.SetMainText("");
+            waitTimeRemaining = waitingPeriod;
+            networkUi.globalText = "";
             // Set text for what team is going
             // Who on the team is going
             // And time remaining for that turn
@@ -41,18 +43,18 @@ public class ServerRoundManager : NetworkBehaviour
         {
             foreach (var player in manager.PlayerLookup.Refs)
             {
-                player.Spectate();
+                player.isSpectating = true;
             }
 
             if (manager.PlayerLookup.Refs.Count() < 2)
             {
-                waitTimeRemaining = WaitingPeriod;
-                server.SetMainText("Waiting for more players...");
+                waitTimeRemaining = waitingPeriod;
+                networkUi.globalText = "Waiting for more players...";
             }
             else
             {
                 waitTimeRemaining -= Time.deltaTime;
-                server.SetMainText($"Starting in {Mathf.RoundToInt(waitTimeRemaining)} seconds!");
+                networkUi.globalText = $"Starting in {Mathf.RoundToInt(waitTimeRemaining)} seconds!";
                 if (waitTimeRemaining <= 0)
                 {
                     CleanupPreviousRound();
@@ -92,7 +94,7 @@ public class ServerRoundManager : NetworkBehaviour
             int index = Random.Range(0, players.Count);
             Player player = players[index];
             players.RemoveAt(index);
-            player.ResetState();
+            player.RoundInit();
             if (playerNumber % 2 == 0)
             {
                 player.Spawn(blueTower.spawnPosition);
@@ -110,8 +112,8 @@ public class ServerRoundManager : NetworkBehaviour
     private bool IsRoundInProgress()
     {
         bool someBlocksOnBothTeams = blueTower.blocks.Count != 0 && redTower.blocks.Count != 0;
-        int bluePlayersNotSpecating = bluePlayers.Count(p => !p.IsSpectating);
-        int redPlayersNotSpecating = redPlayers.Count(p => !p.IsSpectating);
+        int bluePlayersNotSpecating = bluePlayers.Count(p => !p.isSpectating);
+        int redPlayersNotSpecating = redPlayers.Count(p => !p.isSpectating);
         bool somePlayersNotSpecatingOnBothTeams = bluePlayersNotSpecating != 0 && redPlayersNotSpecating != 0;
 
         return someBlocksOnBothTeams && somePlayersNotSpecatingOnBothTeams;

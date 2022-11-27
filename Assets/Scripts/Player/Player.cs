@@ -1,5 +1,6 @@
 using Mirror;
 using Mirror.Examples.Benchmark;
+using ParrelSync;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -8,45 +9,50 @@ using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
-    #region Fields
     private GameManager manager;
+    private PlayerReferences refs;
 
-    [Header("General")]
-    public PlayerMovement movement;
-    public PlayerInteraction interaction;
-    public PlayerConfigurables configurables;
+    [SerializeField] private List<PlayerComponent> playerComponents; 
 
     [SerializeField] private List<GameObject> invisibleToSelf;
 
     [SerializeField] private float ballThrowSpeed;
     [SerializeField] private float ballThrowDistance;
 
-    [SyncVar]
+    [SyncVar(hook = nameof(OnIsSpectatingChange))]
     public bool isSpectating = true;
-    #endregion Fields
+
+    public PlayerMovement Movement => Get<PlayerMovement>();
+    public PlayerInteraction Interaction => Get<PlayerInteraction>();
+    public PlayerConfigurables Configurables => Get<PlayerConfigurables>();
+
+    public T Get<T>() where T : PlayerComponent
+    {
+        foreach (var playerComponent in playerComponents)
+        {
+            if (playerComponent.GetType() == typeof(T))
+            {
+                return (T)playerComponent;
+            }
+        }
+        return null;
+    }
 
     #region Unity Callbacks
     private void Awake()
     {
         manager = FindObjectOfType<GameManager>(true);
+        refs = FindObjectOfType<PlayerReferences>(true);
 
-        movement.PlayerAwake();
-        interaction.PlayerAwake();
-        configurables.PlayerAwake();
+        playerComponents.ForEach(c => c.Init(this, refs));
+
+        playerComponents.ForEach(c => c.PlayerAwake());
     }
-    private void Start()
-    {
-        movement.PlayerStart();
-        interaction.PlayerStart();
-        configurables.PlayerStart();
-    }
+    private void Start() => playerComponents.ForEach(c => c.PlayerStart());
     private void Update()
     {
-        movement.PlayerUpdate();
-        interaction.PlayerUpdate();
-        configurables.PlayerUpdate();
+        playerComponents.ForEach(c => c.PlayerUpdate());
 
-        // TODO remove
         if (Input.GetMouseButtonDown(2))
         {
             Camera camera = Camera.main;
@@ -55,12 +61,7 @@ public class Player : NetworkBehaviour
             CmdThrowBall(position + (direction * ballThrowDistance), direction);
         }
     }
-    private void LateUpdate()
-    {
-        movement.PlayerLateUpdate();
-        interaction.PlayerLateUpdate();
-        configurables.PlayerLateUpdate();
-    }
+    private void LateUpdate() => playerComponents.ForEach(c => c.PlayerLateUpdate());
     #endregion Unity Callbacks
 
     #region Mirror Callbacks
@@ -73,10 +74,12 @@ public class Player : NetworkBehaviour
         // Make own GameObjects invisible
         invisibleToSelf.ForEach(go => go.SetActive(false));
 
+        // Maintain local player reference
         manager.SetLocalPlayer(this);
     }
     public override void OnStartClient()
     {
+        // Maintain player lookup
         if (isClientOnly)
         {
             manager.PlayerLookup.TryAdd(netId, this);
@@ -84,17 +87,20 @@ public class Player : NetworkBehaviour
     }
     public override void OnStartServer()
     {
+        // Maintain player lookup
         manager.PlayerLookup.TryAdd(netId, this);
     }
     public override void OnStopLocalPlayer()
     {
         // Reset transform of own camera
-        Camera.main.transform.SetParent(manager.generalTransform);
+        Camera.main.transform.SetParent(refs.generalTransform);
 
+        // Maintain local player reference
         manager.SetLocalPlayer(null);
     }
     public override void OnStopClient()
     {
+        // Maintain player lookup
         if (isClientOnly)
         {
             manager.PlayerLookup.TryRemoveWithNetId(netId, out _);
@@ -102,43 +108,52 @@ public class Player : NetworkBehaviour
     }
     public override void OnStopServer()
     {
+        // Maintain player lookup
         manager.PlayerLookup.TryRemoveWithNetId(netId, out _);
     }
     #endregion Mirror Callbacks
 
-    public void ResetState()
+    #region Round Lifecycle
+    public void RoundInit() => playerComponents.ForEach(c => c.PlayerRoundInit());
+    [Command]
+    public void CmdSpectate()
     {
-        movement.PlayerResetState();
-        interaction.PlayerResetState();
-        configurables.PlayerResetState();
-    }
-
-    public void Spectate()
-    {
-        if (!IsSpectating)
+        if (!isSpectating)
         {
-            IsSpectating = true;
-            movement.GeneralTeleport(manager.spectatorBoxTransform.position);
+            isSpectating = true;
+        }
+    }
+    private void OnIsSpectatingChange(bool _, bool newIsSpectating)
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        if (newIsSpectating) // Started spectating
+        {
+            Movement.GeneralTeleport(refs.spectatorBoxTransform.position);
         }
     }
     [Server]
     public void Spawn(Vector3 spawnPosition)
     {
-        if (IsSpectating)
+        if (isSpectating)
         {
-            IsSpectating = false;
-            movement.GeneralTeleport(spawnPosition);
+            isSpectating = false;
+            Movement.GeneralTeleport(spawnPosition);
         }
     }
+    #endregion Round Lifecycle
 
     [Command(requiresAuthority = false)]
     public void CmdThrowBall(Vector3 position, Vector3 direction)
     {
-        manager.ball.angularVelocity = Vector3.zero;
-        manager.ball.velocity = Vector3.zero;
+        refs.ball.angularVelocity = Vector3.zero;
+        refs.ball.velocity = Vector3.zero;
 
-        manager.ball.position = position;
+        refs.ball.position = position;
 
-        manager.ball.AddForce(direction.normalized * ballThrowSpeed, ForceMode.VelocityChange);
+        refs.ball.AddForce(direction.normalized * ballThrowSpeed, ForceMode.VelocityChange);
     }
 }

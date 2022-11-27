@@ -5,59 +5,37 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
-public class PlayerConfigurables : NetworkBehaviour, IPlayerCallbacks
+public class PlayerConfigurables : PlayerComponent
 {
-    #region Fields
-    private GameManager manager;
-
-    [SerializeField] private TMP_Text usernameText;
-    [SerializeField] private MeshRenderer bodyMeshRenderer;
-
-    [SyncVar(hook = nameof(OnBodyColorChange))]
-    public Color bodyColor = Color.white;
-
-    [SyncVar(hook = nameof(OnUsernameChange))]
-    public string username = "";
-
-    [SyncVar(hook = nameof(OnMainTextChange))]
-    public string mainText = "";
-    #endregion Fields
-
-    #region Player Callbacks
-    public void PlayerAwake()
+    public override void PlayerAwake()
     {
         manager = FindObjectOfType<GameManager>(true);
     }
-    public void PlayerStart()
+    public override void PlayerLateUpdate()
     {
-        
-    }
-    public void PlayerUpdate()
-    {
-        
-    }
-    public void PlayerLateUpdate()
-    {
-        if (!isLocalPlayer && !manager.IsLocalPlayerNull)
+        // Must occur after player movement update
+        if (!isLocalPlayer)
         {
-            usernameText.transform.LookAt(manager.LocalPlayer.transform);
+            // Aim username text at camera
+            usernameText.transform.LookAt(Camera.main.transform);
+            // Only allow rotation about the y axis
             usernameText.transform.eulerAngles = new Vector3(0, usernameText.transform.eulerAngles.y, 0);
         }
     }
-    public void PlayerResetState()
-    {
-        
-    }
-    #endregion Player Callbacks
 
     #region Username
+    private const int UsernameMaxLength = 16;
+    [Header("Username")]
+    [SerializeField] private TMP_Text usernameText;
+    [SyncVar(hook = nameof(OnUsernameChange))]
+    public string username = "";
     [Command(requiresAuthority = false)]
     public void CmdSetUsername(string newUsername)
     {
         string usernameUntruncated = Regex.Replace(newUsername, @"[^a-zA-Z0-9\s]", string.Empty).Trim();
-        if (usernameUntruncated.Length > 16)
+        if (usernameUntruncated.Length > UsernameMaxLength)
         {
-            usernameUntruncated = usernameUntruncated[..16];
+            usernameUntruncated = usernameUntruncated[..UsernameMaxLength];
         }
         username = usernameUntruncated;
     }
@@ -73,6 +51,10 @@ public class PlayerConfigurables : NetworkBehaviour, IPlayerCallbacks
     #endregion Username
 
     #region Body Color
+    [Header("Body Color")]
+    [SerializeField] private MeshRenderer bodyMeshRenderer;
+    [SyncVar(hook = nameof(OnBodyColorChange))]
+    public Color bodyColor = Color.white;
     [Command(requiresAuthority = false)]
     public void CmdSetBodyColor(Color newBodyColor)
     {
@@ -88,11 +70,4 @@ public class PlayerConfigurables : NetworkBehaviour, IPlayerCallbacks
         bodyMeshRenderer.material.color = newBodyColor;
     }
     #endregion Body Color
-
-    #region Misc Sync
-    private void OnMainTextChange(string _, string newMainText)
-    {
-        manager.mainText.text = newMainText;
-    }
-    #endregion Misc Sync
 }

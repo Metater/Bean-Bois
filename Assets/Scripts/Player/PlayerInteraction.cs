@@ -3,16 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInteraction : NetworkBehaviour, IPlayerCallbacks
+public class PlayerInteraction : PlayerComponent
 {
-    public const int SlotCount = 3;
+    private const int SlotCount = 3;
 
     #region Fields
-    [Header("General")]
-    private GameManager manager;
-    [SerializeField] private Player player;
     [Header("Transforms")]
     [SerializeField] private Transform gripTransform;
+
     [Header("Interaction")]
     [SerializeField] private float reachDistance;
     // item should be smoothed relative to player body position???
@@ -21,23 +19,19 @@ public class PlayerInteraction : NetworkBehaviour, IPlayerCallbacks
     private Item[] slots;
     private int selectedSlotLocal = 0;
     [SyncVar(hook = nameof(OnSlotChanged))] public int selectedSlotSynced = 0;
+
     [Header("Crosshair Colors")]
     [SerializeField] private Color crosshairDefaultColor;
     [SerializeField] private Color crosshairHoverItemColor;
     #endregion Fields
 
-    #region Player Callbacks
-    public void PlayerAwake()
+    public override void PlayerAwake()
     {
         manager = FindObjectOfType<GameManager>(true);
 
         slots = new Item[3];
     }
-    public void PlayerStart()
-    {
-        
-    }
-    public void PlayerUpdate()
+    public override void PlayerUpdate()
     {
         if (!isLocalPlayer)
         {
@@ -58,7 +52,7 @@ public class PlayerInteraction : NetworkBehaviour, IPlayerCallbacks
                 crosshairColor = crosshairHoverItemColor;
             }
         }
-        manager.crosshairImage.color = crosshairColor;
+        refs.crosshairImage.color = crosshairColor;
 
         UpdateSlot();
 
@@ -66,7 +60,7 @@ public class PlayerInteraction : NetworkBehaviour, IPlayerCallbacks
         {
             if (Input.GetKeyDown(KeyCode.G) && selectedSlotLocal == selectedSlotSynced)
             {
-                CmdDropItem(selectedItem.netId, Camera.main.transform.forward, player.movement.Velocity);
+                CmdDropItem(selectedItem.netId, Camera.main.transform.forward, player.Movement.GetCurrentVelocity());
             }
         }
 
@@ -82,15 +76,6 @@ public class PlayerInteraction : NetworkBehaviour, IPlayerCallbacks
             item.transform.SetPositionAndRotation(position, rotation);
         }
     }
-    public void PlayerLateUpdate()
-    {
-
-    }
-    public void PlayerResetState()
-    {
-        
-    }
-    #endregion Player Callbacks
 
     #region Slot
     private void OnSlotChanged(int oldSelectedSlot, int newSelectedSlot)
@@ -169,13 +154,21 @@ public class PlayerInteraction : NetworkBehaviour, IPlayerCallbacks
             int slot = selectedSlotSynced;
             if (slots[slot] == null)
             {
-                // Unnessarily removes and reassigns client authority when client picks up same item >= 2 times in a row
+                // item is owned
                 if (item.netIdentity.connectionToClient != null)
                 {
-                    item.netIdentity.RemoveClientAuthority();
+                    // item is not owned by desired owner
+                    if (connectionToClient != item.netIdentity.connectionToClient)
+                    {
+                        item.netIdentity.RemoveClientAuthority();
+                        item.netIdentity.AssignClientAuthority(connectionToClient);
+                    }
+                }
+                else // item is unowned
+                {
+                    item.netIdentity.AssignClientAuthority(connectionToClient);
                 }
 
-                item.netIdentity.AssignClientAuthority(connectionToClient);
                 if (isServerOnly)
                 {
                     SharedPickupItem(item, slot);

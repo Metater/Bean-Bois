@@ -29,7 +29,8 @@ public class PlayerConfigurables : PlayerComponent
     [SerializeField] private TMP_Text usernameText;
     [SyncVar(hook = nameof(OnUsernameChange))]
     public string username = "";
-    [Command(requiresAuthority = false)]
+    // [Command(requiresAuthority = false)]
+    [Command]
     public void CmdSetUsername(string newUsername)
     {
         string usernameUntruncated = Regex.Replace(newUsername, @"[^a-zA-Z0-9\s]", string.Empty).Trim();
@@ -55,7 +56,8 @@ public class PlayerConfigurables : PlayerComponent
     [SerializeField] private MeshRenderer bodyMeshRenderer;
     [SyncVar(hook = nameof(OnBodyColorChange))]
     public Color bodyColor = Color.white;
-    [Command(requiresAuthority = false)]
+    // [Command(requiresAuthority = false)]
+    [Command]
     public void CmdSetBodyColor(Color newBodyColor)
     {
         bodyColor = newBodyColor;

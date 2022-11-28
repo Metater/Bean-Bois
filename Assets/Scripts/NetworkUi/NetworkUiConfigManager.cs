@@ -11,6 +11,8 @@ public class NetworkUiConfigManager : NetworkBehaviour
     #region Fields
     private GameManager manager;
 
+    [SerializeField] private float uiPollPeriod;
+
     [SerializeField] private TMP_Text usernameText;
 
     [SerializeField] private Image selectedBodyColorImage;
@@ -63,7 +65,7 @@ public class NetworkUiConfigManager : NetworkBehaviour
                     configurables.CmdSetBodyColor(bodyColor);
                 }
             }
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(uiPollPeriod);
         }
     }
 }

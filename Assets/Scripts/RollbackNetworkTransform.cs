@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("Network/Network Transform")]
-public class NetworkTransform : NetworkBehaviour
+public class RollbackNetworkTransform : NetworkBehaviour
 {
     // target transform to sync. can be on a child.
     [Header("Target")]
@@ -83,6 +83,14 @@ public class NetworkTransform : NetworkBehaviour
     public bool showGizmos;
     public bool showOverlay;
     public Color overlayColor = new(0, 0, 0, 0.5f);
+
+    [Header("Rollback")]
+    // Pure servers or hosts only
+    public List<Collider> rollbackColliders;
+    public double rollbackSnapshotQueueExpiryTime;
+    internal Queue<TransformSnapshot> rollbackSnapshotQueue = new();
+    // Pure clients only
+    public TransformSnapshot? AppliedSnapshot { get; private set; } = null;
 
     // initialization //////////////////////////////////////////////////////
     // make sure to call this when inheriting too!
@@ -218,8 +226,7 @@ public class NetworkTransform : NetworkBehaviour
         if (!rotation.HasValue) rotation = serverSnapshots.Count > 0 ? serverSnapshots.Values[serverSnapshots.Count - 1].rotation : target.localRotation;
         if (!scale.HasValue) scale = serverSnapshots.Count > 0 ? serverSnapshots.Values[serverSnapshots.Count - 1].scale : target.localScale;
 
-        // insert transform snapshot
-        SnapshotInterpolation.InsertIfNotExists(serverSnapshots, new TransformSnapshot(
+        TransformSnapshot snapshot = new(
             timestamp,         // arrival remote timestamp. NOT remote time.
 #if !UNITY_2020_3_OR_NEWER
             NetworkTime.localTime, // Unity 2019 doesn't have timeAsDouble yet
@@ -229,7 +236,15 @@ public class NetworkTransform : NetworkBehaviour
             position.Value,
             rotation.Value,
             scale.Value
-        ));
+        );
+
+        // insert transform snapshot
+        bool wasInserted = SnapshotInterpolation.InsertIfNotExists(serverSnapshots, snapshot);
+
+        if (wasInserted)
+        {
+            rollbackSnapshotQueue.Enqueue(snapshot);
+        }
     }
 
     // rpc /////////////////////////////////////////////////////////////////
@@ -508,12 +523,13 @@ public class NetworkTransform : NetworkBehaviour
                 // interpolate & apply
                 TransformSnapshot computed = new(
                     Mathd.LerpUnclamped(from.remoteTime, to.remoteTime, t),
-                    Mathd.LerpUnclamped(from.localTime, to.localTime, t),
+                    0,
                     Vector3.LerpUnclamped(from.position, to.position, (float)t),
                     Quaternion.SlerpUnclamped(from.rotation, to.rotation, (float)t),
                     Vector3.LerpUnclamped(from.scale, to.scale, (float)t)
                 );
                 ApplySnapshot(computed);
+                AppliedSnapshot = computed;
             }
         }
     }
@@ -521,7 +537,27 @@ public class NetworkTransform : NetworkBehaviour
     void Update()
     {
         // if server then always sync to others.
-        if (isServer) UpdateServer();
+        if (isServer)
+        {
+            UpdateServer();
+
+            if (!isLocalPlayer)
+            {
+                // Remove stale rollback snapshots
+                while (rollbackSnapshotQueue.Count > 1)
+                {
+                    var snapshot = rollbackSnapshotQueue.Peek();
+                    if (Time.timeAsDouble - rollbackSnapshotQueueExpiryTime > snapshot.localTime)
+                    {
+                        rollbackSnapshotQueue.Dequeue();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
         // 'else if' because host mode shouldn't send anything to server.
         // it is the server. don't overwrite anything there.
         else if (isClient) UpdateClient();
@@ -635,12 +671,81 @@ public class NetworkTransform : NetworkBehaviour
         RpcTeleport(destination, rotation);
     }
 
+    // Returns if raycast hit one of the given colliders during the rollback
+    [Server]
+    public bool RollbackAndRaycast(double localTime, Vector3 origin, Vector3 direction, float maxDistance, int layerMask)
+    {
+        // Beware: Moving objects can block the ray differently on client and server
+        // Ignoring that should still be fairly fair
+
+        if (rollbackSnapshotQueue.Count == 0)
+            return false;
+
+        TransformSnapshot fromRollbackSnapshot = new();
+        TransformSnapshot toRollbackSnapshot = new();
+
+        bool hasFromRollbackSnapshot = false;
+
+        // Increasing snapshot.localTime
+        foreach (var snapshot in rollbackSnapshotQueue)
+        {
+            if (snapshot.localTime <= localTime)
+            {
+                fromRollbackSnapshot = snapshot;
+                hasFromRollbackSnapshot = true;
+            }
+            else
+            {
+                toRollbackSnapshot = snapshot;
+                break;
+            }
+        }
+
+        if (!hasFromRollbackSnapshot)
+            return false;
+
+        if (rollbackSnapshotQueue.Count == 1)
+        {
+            toRollbackSnapshot = fromRollbackSnapshot;
+        }
+
+        double t = Mathd.InverseLerp(fromRollbackSnapshot.localTime, toRollbackSnapshot.localTime, localTime);
+
+        var rollbackSnapshot = TransformSnapshot.Interpolate(fromRollbackSnapshot, toRollbackSnapshot, t);
+        var currentSnapshot = ConstructSnapshot();
+        ApplySnapshot(rollbackSnapshot);
+        rollbackColliders.ForEach(c =>
+        {
+            // Resync transform
+            c.enabled = false;
+            c.enabled = true;
+        });
+        bool raycastHitARollbackCollider = false;
+        if (Physics.Raycast(origin, direction, out var hit, maxDistance, layerMask))
+        {
+            if (rollbackColliders.Contains(hit.collider))
+            {
+                raycastHitARollbackCollider = true;
+            }
+        }
+        ApplySnapshot(currentSnapshot);
+        rollbackColliders.ForEach(c =>
+        {
+            // Resync transform
+            c.enabled = false;
+            c.enabled = true;
+        });
+
+        return raycastHitARollbackCollider;
+    }
+
     public virtual void Reset()
     {
         // disabled objects aren't updated anymore.
         // so let's clear the buffers.
         serverSnapshots.Clear();
         clientSnapshots.Clear();
+        rollbackSnapshotQueue.Clear();
     }
 
     protected virtual void OnDisable() => Reset();

@@ -12,6 +12,7 @@ public abstract class Item : NetworkBehaviour
     [SerializeField] protected float dropForce;
     [SerializeField] protected GameObject modelGameObject;
 
+    // TODO this isnt necessary or used currently and never will be, only complexity
     [System.NonSerialized] public Vector3 smoothDampVelocity = Vector3.zero;
 
     public bool IsPickedUp { get; private set; } = false;

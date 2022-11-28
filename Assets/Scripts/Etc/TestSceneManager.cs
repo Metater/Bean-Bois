@@ -22,7 +22,7 @@ public class TestSceneManager : MonoBehaviour
         target.transform.position = ephemeralTarget.position;
         collider.enabled = false;
         collider.enabled = true;
-        if (Physics.Raycast(shooter.transform.position, shooter.transform.right, out var hit))
+        if (Physics.Raycast(shooter.transform.position, shooter.transform.right, out var _))
         {
                 
         }

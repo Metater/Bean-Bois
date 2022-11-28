@@ -8,7 +8,6 @@ using UnityEngine.UI;
 
 public class NetworkUiConfigManager : NetworkBehaviour
 {
-    #region Fields
     private GameManager manager;
 
     [SerializeField] private float uiPollPeriod;
@@ -22,7 +21,6 @@ public class NetworkUiConfigManager : NetworkBehaviour
 
     private string Username => usernameText.text;
     private Color BodyColor => new(redBodyColorSlider.value, greenBodyColorSlider.value, blueBodyColorSlider.value);
-    #endregion Fields
 
     #region Unity Callbacks
     private void Awake()
@@ -32,8 +30,6 @@ public class NetworkUiConfigManager : NetworkBehaviour
         redBodyColorSlider.value = Random.value;
         greenBodyColorSlider.value = Random.value;
         blueBodyColorSlider.value = Random.value;
-
-        selectedBodyColorImage.color = BodyColor;
     }
     private void Start()
     {

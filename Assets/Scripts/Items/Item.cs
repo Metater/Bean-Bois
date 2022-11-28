@@ -5,16 +5,14 @@ using UnityEngine;
 
 public abstract class Item : NetworkBehaviour
 {
-    #region Fields
-    [Header("General")]
     private GameManager manager;
 
     [SerializeField] protected OwnedRigidbody ownedRigidbody;
+    // TODO RENAME TO dropForceMultiplier
     [SerializeField] protected float dropForce;
     [SerializeField] protected GameObject modelGameObject;
 
-    public bool IsPickedUp { get; private set; } = false;
-    #endregion Fields
+    public bool IsHeld { get; private set; } = false;
 
     // TODO when a client leaves and is holding an item, funky stuff happens
 
@@ -37,78 +35,83 @@ public abstract class Item : NetworkBehaviour
     {
         manager.ItemLookup.TryAdd(netId, this);
 
+        // Server has responsibility of doing item physics when item has no owners
         ownedRigidbody.Enable();
     }
     public override void OnStopClient()
     {
-        /*
-        foreach (var item in manager.ItemLookup.Refs)
-        {
-
-        }
-        */
-
         if (isClientOnly)
         {
-            print("bye bye client only");
-
             manager.ItemLookup.TryRemoveWithNetId(netId, out _);
         }
     }
     public override void OnStopServer()
     {
-        print("bye bye server");
-
         manager.ItemLookup.TryRemoveWithNetId(netId, out _);
     }
     public override void OnStartAuthority()
     {
-        print("Start authority");
         ownedRigidbody.Enable();
     }
     public override void OnStopAuthority()
     {
-        print("Stop authority");
         ownedRigidbody.Disable();
     }
     #endregion Mirror Callbacks
 
     [Server]
-    public void StopServerPhysics()
+    public void DisableOwnedRigidbody()
     {
         ownedRigidbody.Disable();
     }
 
+    // Client and Server
     public void Pickup()
     {
-        IsPickedUp = true;
+        IsHeld = true;
 
+        // Disable item colliders while picked up
         ownedRigidbody.SetColliders(false);
+        // When the object is picked up, disable the rigidbody if it exists
+        // Nobody needs physics now
         ownedRigidbody.Disable();
 
         PickupProtected();
     }
+    // Client and Server
     public void Drop(Vector3 dropVector, Vector3 velocity)
     {
-        IsPickedUp = false;
+        IsHeld = false;
 
+        // When object is dropped, enable item colliders for everyone
         ownedRigidbody.SetColliders(true);
+
+        // When dropped and object is owned
+        // It is now the owners responsibilty to control the rigidbody for the item
+        // Enable the rigidbody and add the force to drop it
         if (isOwned)
         {
             ownedRigidbody.Enable();
+            // Beware: dropVector and velocity are assumed to be trustworthy
             ownedRigidbody.Rigidbody.AddForce((dropVector * dropForce) + velocity, ForceMode.Impulse);
         }
 
         DropProtected();
     }
+    // Client and Server
     public void Select()
     {
+        // Enable visual while selected for everyone
         modelGameObject.SetActive(true);
+
         SelectProtected();
     }
+    // Client and Server
     public void Deselect()
     {
+        // Disable visual when deselected
         modelGameObject.SetActive(false);
+
         DeselectProtected();
     }
 

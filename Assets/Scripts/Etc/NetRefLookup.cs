@@ -11,9 +11,9 @@ public class NetRefLookup<T> where T : NetworkBehaviour
 
     public IEnumerable<T> Refs => lookup.Values;
 
-    public bool TryAdd(uint netId, T reference)
+    public bool TryAdd(T reference)
     {
-        return lookup.TryAdd(netId, reference);
+        return lookup.TryAdd(reference.netId, reference);
     }
 
     public bool TryGet(Predicate<T> predicate, out T reference)

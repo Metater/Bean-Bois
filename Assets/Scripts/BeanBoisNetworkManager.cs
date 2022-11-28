@@ -171,7 +171,6 @@ public class BeanBoisNetworkManager : NetworkManager
             {
                 if (netIdentity.TryGetComponent<OwnedRigidbody>(out var ownedRigidbody))
                 {
-                    netIdentity.RemoveClientAuthority();
                     ownedRigidbody.OnOwnerDisconnect();
                 }
             }

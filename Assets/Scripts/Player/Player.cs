@@ -44,7 +44,7 @@ public class Player : NetworkBehaviour
         manager = FindObjectOfType<GameManager>(true);
         refs = FindObjectOfType<PlayerReferences>(true);
 
-        playerComponents.ForEach(c => c.Init(this, refs));
+        playerComponents.ForEach(c => c.Init(manager, refs, this));
 
         playerComponents.ForEach(c => c.PlayerAwake());
     }

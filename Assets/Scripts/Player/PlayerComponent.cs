@@ -6,14 +6,14 @@ using UnityEngine;
 public abstract class PlayerComponent : NetworkBehaviour
 {
     protected GameManager manager;
-    protected Player player;
     protected PlayerReferences refs;
+    protected Player player;
 
-    public void Init(Player player, PlayerReferences refs)
+    public void Init(GameManager manager, PlayerReferences refs, Player player)
     {
-        manager = FindObjectOfType<GameManager>(true);
-        this.player = player;
+        this.manager = manager;
         this.refs = refs;
+        this.player = player;
     }
 
     public virtual void PlayerAwake() { }

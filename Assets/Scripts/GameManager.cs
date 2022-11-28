@@ -10,6 +10,8 @@ using UnityEngine.UI;
     Transfer authority back to server ^^^^^^^^^^^^^^^^^^^^ On disconnect
 */
 
+// TODO for using RollbackAndRaycast raycastLayers, do Physics.DefaultRaycastLayers ^ LayerMask.GetMask("Item")
+
 public class GameManager : MonoBehaviour
 {
     #region Fields
@@ -23,10 +25,6 @@ public class GameManager : MonoBehaviour
     public NetRefLookup<Player> PlayerLookup { get; private set; }
     public NetRefLookup<Item> ItemLookup { get; private set; }
     #endregion Fields
-
-    #region References
-
-    #endregion References
 
     #region Unity Callbacks
     private void Awake()

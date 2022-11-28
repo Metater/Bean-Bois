@@ -8,15 +8,15 @@ public abstract class Item : NetworkBehaviour
     #region Fields
     [Header("General")]
     private GameManager manager;
-    [SerializeField] protected Rigidbody rb;
+
+    [SerializeField] protected OwnedRigidbody ownedRigidbody;
     [SerializeField] protected float dropForce;
     [SerializeField] protected GameObject modelGameObject;
 
-    // TODO this isnt necessary or used currently and never will be, only complexity
-    [System.NonSerialized] public Vector3 smoothDampVelocity = Vector3.zero;
-
     public bool IsPickedUp { get; private set; } = false;
     #endregion Fields
+
+    // TODO when a client leaves and is holding an item, funky stuff happens
 
     #region Unity Callbacks
     private void Awake()
@@ -36,6 +36,8 @@ public abstract class Item : NetworkBehaviour
     public override void OnStartServer()
     {
         manager.ItemLookup.TryAdd(netId, this);
+
+        ownedRigidbody.Enable();
     }
     public override void OnStopClient()
     {
@@ -62,22 +64,27 @@ public abstract class Item : NetworkBehaviour
     public override void OnStartAuthority()
     {
         print("Start authority");
+        ownedRigidbody.Enable();
     }
     public override void OnStopAuthority()
     {
         print("Stop authority");
+        ownedRigidbody.Disable();
     }
     #endregion Mirror Callbacks
+
+    [Server]
+    public void StopServerPhysics()
+    {
+        ownedRigidbody.Disable();
+    }
 
     public void Pickup()
     {
         IsPickedUp = true;
 
-        rb.useGravity = false;
-        rb.detectCollisions = false;
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        smoothDampVelocity = Vector3.zero;
+        ownedRigidbody.SetColliders(false);
+        ownedRigidbody.Disable();
 
         PickupProtected();
     }
@@ -85,11 +92,13 @@ public abstract class Item : NetworkBehaviour
     {
         IsPickedUp = false;
 
-        rb.useGravity = true;
-        rb.detectCollisions = true;
+        ownedRigidbody.SetColliders(true);
+        if (isOwned)
+        {
+            ownedRigidbody.Enable();
+            ownedRigidbody.Rigidbody.AddForce((dropVector * dropForce) + velocity, ForceMode.Impulse);
+        }
 
-        // messes with sync? could have no authority, hasAuthority check????
-        rb.AddForce((dropVector * dropForce) + velocity, ForceMode.Impulse);
         DropProtected();
     }
     public void Select()

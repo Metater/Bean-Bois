@@ -13,10 +13,8 @@ public class PlayerInteraction : PlayerComponent
 
     [Header("Interaction")]
     [SerializeField] private float reachDistance;
-    // item should be smoothed relative to player body position???
-    [SerializeField] private float itemSmoothTime;
     [SerializeField] private float itemRotationSlerpMultiplier;
-    private Item[] slots;
+    private readonly Item[] slots = new Item[SlotCount];
     private int selectedSlotLocal = 0;
     [SyncVar(hook = nameof(OnSlotChanged))] public int selectedSlotSynced = 0;
 
@@ -28,8 +26,6 @@ public class PlayerInteraction : PlayerComponent
     public override void PlayerAwake()
     {
         manager = FindObjectOfType<GameManager>(true);
-
-        slots = new Item[3];
     }
     public override void PlayerUpdate()
     {
@@ -43,7 +39,8 @@ public class PlayerInteraction : PlayerComponent
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         if (selectedItem == null && Physics.Raycast(ray, out var hit, reachDistance))
         {
-            if (hit.transform.gameObject.TryGetComponent<Item>(out var item) && !item.IsPickedUp)
+            Item item = hit.transform.gameObject.GetComponentInParent<Item>();
+            if (item != null && !item.IsPickedUp)
             {
                 if (Input.GetKeyDown(KeyCode.E))
                 {
@@ -71,9 +68,8 @@ public class PlayerInteraction : PlayerComponent
                 continue;
             }
 
-            Vector3 position = Vector3.SmoothDamp(item.transform.position, gripTransform.position, ref item.smoothDampVelocity, itemSmoothTime);
             Quaternion rotation = Quaternion.Slerp(item.transform.rotation, gripTransform.rotation, Time.deltaTime * itemRotationSlerpMultiplier);
-            item.transform.SetPositionAndRotation(position, rotation);
+            item.transform.SetPositionAndRotation(gripTransform.position, rotation);
         }
     }
 
@@ -166,6 +162,12 @@ public class PlayerInteraction : PlayerComponent
                 }
                 else // item is unowned
                 {
+                    // Server was doing physics for the item, now it doesnt need to
+                    if (isServer)
+                    {
+                        item.StopServerPhysics();
+                    }
+
                     item.netIdentity.AssignClientAuthority(connectionToClient);
                 }
 

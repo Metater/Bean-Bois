@@ -11,6 +11,22 @@ public class NetRefLookup<T> where T : NetworkBehaviour
 
     public IEnumerable<T> Refs => lookup.Values;
 
+    public void Add(T reference)
+    {
+        lookup[reference.netId] = reference;
+    }
+
+    public void Remove(T reference)
+    {
+        lookup.Remove(reference.netId);
+    }
+
+    public bool TryGetWithNetId(uint netId, out T reference)
+    {
+        return lookup.TryGetValue(netId, out reference);
+    }
+
+    /*
     public bool TryAdd(T reference)
     {
         return lookup.TryAdd(reference.netId, reference);
@@ -30,13 +46,14 @@ public class NetRefLookup<T> where T : NetworkBehaviour
         return false;
     }
 
-    public bool TryGetWithNetId(uint netId, out T reference)
+    public bool TryRemove(T reference)
     {
-        return lookup.TryGetValue(netId, out reference);
+        return lookup.Remove(reference.netId);
     }
 
     public bool TryRemoveWithNetId(uint netId, out T reference)
     {
         return lookup.Remove(netId, out reference);
     }
+    */
 }

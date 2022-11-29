@@ -26,28 +26,22 @@ public abstract class Item : NetworkBehaviour
     #region Mirror Callbacks
     public override void OnStartClient()
     {
-        if (isClientOnly)
-        {
-            manager.ItemLookup.TryAdd(netId, this);
-        }
+        manager.ItemLookup.Add(this);
     }
     public override void OnStartServer()
     {
-        manager.ItemLookup.TryAdd(netId, this);
+        manager.ItemLookup.Add(this);
 
         // Server has responsibility of doing item physics when item has no owners
         ownedRigidbody.Enable();
     }
     public override void OnStopClient()
     {
-        if (isClientOnly)
-        {
-            manager.ItemLookup.TryRemoveWithNetId(netId, out _);
-        }
+        manager.ItemLookup.Remove(this);
     }
     public override void OnStopServer()
     {
-        manager.ItemLookup.TryRemoveWithNetId(netId, out _);
+        manager.ItemLookup.Remove(this);
     }
     public override void OnStartAuthority()
     {

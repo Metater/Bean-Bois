@@ -40,7 +40,7 @@ public class PlayerInteraction : PlayerComponent
         if (selectedItem == null && Physics.Raycast(ray, out var hit, reachDistance))
         {
             Item item = hit.transform.gameObject.GetComponentInParent<Item>();
-            if (item != null && !item.IsPickedUp)
+            if (item != null && !item.IsHeld)
             {
                 if (Input.GetKeyDown(KeyCode.E))
                 {
@@ -61,6 +61,7 @@ public class PlayerInteraction : PlayerComponent
             }
         }
 
+        // TODO also do this on teleport, make event
         foreach (var item in slots)
         {
             if (item == null || !item.isOwned)
@@ -145,7 +146,7 @@ public class PlayerInteraction : PlayerComponent
     [Command]
     public void CmdPickupItem(uint netId)
     {
-        if (manager.ItemLookup.TryGetWithNetId(netId, out var item) && !item.IsPickedUp)
+        if (manager.ItemLookup.TryGetWithNetId(netId, out var item) && !item.IsHeld)
         {
             int slot = selectedSlotSynced;
             if (slots[slot] == null)
@@ -165,7 +166,7 @@ public class PlayerInteraction : PlayerComponent
                     // Server was doing physics for the item, now it doesnt need to
                     if (isServer)
                     {
-                        item.StopServerPhysics();
+                        item.DisableOwnedRigidbody();
                     }
 
                     item.netIdentity.AssignClientAuthority(connectionToClient);

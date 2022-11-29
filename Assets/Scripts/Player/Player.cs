@@ -80,15 +80,12 @@ public class Player : NetworkBehaviour
     public override void OnStartClient()
     {
         // Maintain player lookup
-        if (isClientOnly)
-        {
-            manager.PlayerLookup.TryAdd(netId, this);
-        }
+        manager.PlayerLookup.Add(this);
     }
     public override void OnStartServer()
     {
         // Maintain player lookup
-        manager.PlayerLookup.TryAdd(netId, this);
+        manager.PlayerLookup.Add(this);
     }
     public override void OnStopLocalPlayer()
     {
@@ -101,15 +98,12 @@ public class Player : NetworkBehaviour
     public override void OnStopClient()
     {
         // Maintain player lookup
-        if (isClientOnly)
-        {
-            manager.PlayerLookup.TryRemoveWithNetId(netId, out _);
-        }
+        manager.PlayerLookup.Remove(this);
     }
     public override void OnStopServer()
     {
         // Maintain player lookup
-        manager.PlayerLookup.TryRemoveWithNetId(netId, out _);
+        manager.PlayerLookup.Remove(this);
     }
     #endregion Mirror Callbacks
 

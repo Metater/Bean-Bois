@@ -11,6 +11,9 @@ public class NetRefLookup<T> where T : NetworkBehaviour
 
     public IEnumerable<T> Refs => lookup.Values;
 
+    // Keep in mind this Add function is called twice on hosts
+    // For code simplicity, its put in OnClientStart and OnServerStart
+    // No isClientOnly check is done
     public void Add(T reference)
     {
         lookup[reference.netId] = reference;

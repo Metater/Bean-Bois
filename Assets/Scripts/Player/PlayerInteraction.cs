@@ -16,7 +16,8 @@ public class PlayerInteraction : PlayerComponent
     [SerializeField] private float itemRotationSlerpMultiplier;
     private readonly Item[] slots = new Item[SlotCount];
     private int selectedSlotLocal = 0;
-    [SyncVar(hook = nameof(OnSlotChanged))] public int selectedSlotSynced = 0;
+    [SyncVar(hook = nameof(OnSlotChanged))]
+    public int selectedSlotSynced = 0;
 
     [Header("Crosshair Colors")]
     [SerializeField] private Color crosshairDefaultColor;
@@ -166,10 +167,7 @@ public class PlayerInteraction : PlayerComponent
                 else // item is unowned
                 {
                     // Server was doing physics for the item, now it doesnt need to
-                    if (isServer)
-                    {
-                        item.DisableOwnedRigidbody();
-                    }
+                    item.ServerDisableOwnedRigidbody();
 
                     item.netIdentity.AssignClientAuthority(connectionToClient);
                 }

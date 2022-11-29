@@ -8,13 +8,13 @@ public abstract class Item : NetworkBehaviour
     private GameManager manager;
 
     [SerializeField] protected OwnedRigidbody ownedRigidbody;
-    // TODO RENAME TO dropForceMultiplier
-    [SerializeField] protected float dropForce;
+    [SerializeField] protected float dropForceMultiplier; // TODO value is 5
     [SerializeField] protected GameObject modelGameObject;
 
     public bool IsHeld { get; private set; } = false;
 
     // TODO when a client leaves and is holding an item, funky stuff happens
+    // Beware: Owners of this item are completely trusted
 
     #region Unity Callbacks
     private void Awake()
@@ -43,6 +43,7 @@ public abstract class Item : NetworkBehaviour
     {
         manager.ItemLookup.Remove(this);
     }
+
     public override void OnStartAuthority()
     {
         ownedRigidbody.Enable();
@@ -52,12 +53,6 @@ public abstract class Item : NetworkBehaviour
         ownedRigidbody.Disable();
     }
     #endregion Mirror Callbacks
-
-    [Server]
-    public void DisableOwnedRigidbody()
-    {
-        ownedRigidbody.Disable();
-    }
 
     // Client and Server
     public void Pickup()
@@ -86,8 +81,7 @@ public abstract class Item : NetworkBehaviour
         if (isOwned)
         {
             ownedRigidbody.Enable();
-            // Beware: dropVector and velocity are assumed to be trustworthy
-            ownedRigidbody.Rigidbody.AddForce((dropVector * dropForce) + velocity, ForceMode.Impulse);
+            ownedRigidbody.Rigidbody.AddForce((dropVector * dropForceMultiplier) + velocity, ForceMode.Impulse);
         }
 
         DropProtected();
@@ -115,4 +109,11 @@ public abstract class Item : NetworkBehaviour
     protected abstract void DeselectProtected();
     protected abstract void LeftClickProtected();
     protected abstract void RightClickProtected();
+
+    [Server]
+    public void ServerDisableOwnedRigidbody()
+    {
+        // Allows owner to control rigidbody now
+        ownedRigidbody.Disable();
+    }
 }

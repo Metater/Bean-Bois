@@ -18,7 +18,6 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    #region Fields
     private UiManager ui;
 
     public Player LocalPlayer { get; private set; }
@@ -28,7 +27,6 @@ public class GameManager : MonoBehaviour
 
     public NetRefLookup<Player> PlayerLookup { get; private set; }
     public NetRefLookup<Item> ItemLookup { get; private set; }
-    #endregion Fields
 
     #region Unity Callbacks
     private void Awake()
@@ -61,6 +59,13 @@ public class GameManager : MonoBehaviour
     }
     */
 
+    private void UpdateCursorVisibility()
+    {
+        Cursor.lockState = IsCursorVisable ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = IsCursorVisable;
+        ui.ShowUi(IsCursorVisable);
+    }
+
     public void SetLocalPlayer(Player localPlayer)
     {
         LocalPlayer = localPlayer;
@@ -72,12 +77,5 @@ public class GameManager : MonoBehaviour
         }
 
         ui.SetUiDisabled(IsLocalPlayerNull);
-    }
-
-    private void UpdateCursorVisibility()
-    {
-        Cursor.lockState = IsCursorVisable ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible = IsCursorVisable;
-        ui.ShowUi(IsCursorVisable);
     }
 }

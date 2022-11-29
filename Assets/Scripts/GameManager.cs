@@ -13,7 +13,8 @@ using UnityEngine.UI;
 // TODO for using RollbackAndRaycast raycastLayers, do Physics.DefaultRaycastLayers ^ LayerMask.GetMask("Item")
 
 // TODO Make sync vars private??? in some cases it is unclear that it is doing something over the network
-//^^^^^^^ Maybe use prefix net_or something
+
+// TODO try to get rid of most public variables
 
 public class GameManager : MonoBehaviour
 {

@@ -111,6 +111,13 @@ public abstract class Item : NetworkBehaviour
     protected abstract void RightClickProtected();
 
     [Server]
+    public void ServerEnableOwnedRigidbody()
+    {
+        // Server controls rigidbody now
+        ownedRigidbody.Disable();
+    }
+
+    [Server]
     public void ServerDisableOwnedRigidbody()
     {
         // Allows owner to control rigidbody now

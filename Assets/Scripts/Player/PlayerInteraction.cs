@@ -23,6 +23,8 @@ public class PlayerInteraction : PlayerComponent
     [SerializeField] private Color crosshairHoverItemColor;
     #endregion Fields
 
+    // TODO Separate item pickup/drop logic and item/slot logic
+
     public override void PlayerAwake()
     {
         manager = FindObjectOfType<GameManager>(true);

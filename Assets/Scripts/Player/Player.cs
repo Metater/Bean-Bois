@@ -25,6 +25,7 @@ public class Player : NetworkBehaviour
     public PlayerMovement Movement => Get<PlayerMovement>();
     public PlayerInteraction Interaction => Get<PlayerInteraction>();
     public PlayerConfigurables Configurables => Get<PlayerConfigurables>();
+    public PlayerEvents Events => Get<PlayerEvents>();
 
     public T Get<T>() where T : PlayerComponent
     {
@@ -129,8 +130,11 @@ public class Player : NetworkBehaviour
             Movement.GeneralTeleport(refs.spectatorBoxTransform.position);
         }
     }
+    // TODO could just use isSpectating sync var, then subscribe to the event in
+    // Movement, to replace movement.GeneralTeleport()
+    // TODO dont need, spawn, round start, spectatic, round stop
     [Server]
-    public void Spawn(Vector3 spawnPosition)
+    public void ServerSpawn(Vector3 spawnPosition)
     {
         if (isSpectating)
         {

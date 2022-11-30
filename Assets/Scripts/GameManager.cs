@@ -78,4 +78,9 @@ public class GameManager : MonoBehaviour
 
         ui.SetUiDisabled(IsLocalPlayerNull);
     }
+    
+    #region Events
+    [Server]
+    
+    #endregion Events
 }

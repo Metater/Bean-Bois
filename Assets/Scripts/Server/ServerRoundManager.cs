@@ -33,7 +33,6 @@ public class ServerRoundManager : NetworkBehaviour
 
         if (IsRoundInProgress())
         {
-            waitTimeRemaining = waitingPeriod;
             networkUi.globalText = "";
             // Set text for what team is going
             // Who on the team is going
@@ -80,6 +79,8 @@ public class ServerRoundManager : NetworkBehaviour
         bluePlayers.Clear();
         redTower.blocks.ForEach(b => b.NetworkDestroy());
         redPlayers.Clear();
+
+        waitTimeRemaining = waitingPeriod;
     }
 
     private void StartRound()
@@ -111,10 +112,11 @@ public class ServerRoundManager : NetworkBehaviour
 
     private bool IsRoundInProgress()
     {
-        bool someBlocksOnBothTeams = blueTower.blocks.Count != 0 && redTower.blocks.Count != 0;
-        int bluePlayersNotSpecating = bluePlayers.Count(p => !p.isSpectating);
-        int redPlayersNotSpecating = redPlayers.Count(p => !p.isSpectating);
-        bool somePlayersNotSpecatingOnBothTeams = bluePlayersNotSpecating != 0 && redPlayersNotSpecating != 0;
+        bool someBlocksOnBothTeams = blueTower.blocks.Count != 0 &&
+            redTower.blocks.Count != 0;
+
+        bool somePlayersNotSpecatingOnBothTeams = bluePlayers.Count(p => !p.isSpectating) != 0 &&
+            redPlayers.Count(p => !p.isSpectating) != 0;
 
         return someBlocksOnBothTeams && somePlayersNotSpecatingOnBothTeams;
     }

@@ -67,6 +67,8 @@ public class PlayerConfigurables : PlayerComponent
             return;
         }
 
+        // TODO does this work with three people?
+        // GetComponent().material? https://mirror-networking.gitbook.io/docs/guides/synchronization/syncvar-hooks
         bodyMeshRenderer.material.color = newBodyColor;
     }
     #endregion Body Color

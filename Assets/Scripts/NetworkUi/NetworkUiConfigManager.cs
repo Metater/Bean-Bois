@@ -12,16 +12,6 @@ public class NetworkUiConfigManager : NetworkBehaviour
 
     [SerializeField] private float uiPollPeriod;
 
-    [SerializeField] private TMP_Text usernameText;
-
-    [SerializeField] private Image selectedBodyColorImage;
-    [SerializeField] private Slider redBodyColorSlider;
-    [SerializeField] private Slider greenBodyColorSlider;
-    [SerializeField] private Slider blueBodyColorSlider;
-
-    private string Username => usernameText.text;
-    private Color BodyColor => new(redBodyColorSlider.value, greenBodyColorSlider.value, blueBodyColorSlider.value);
-
     #region Unity Callbacks
     private void Awake()
     {
@@ -37,7 +27,6 @@ public class NetworkUiConfigManager : NetworkBehaviour
     }
     private void Update()
     {
-        // TODO update only on change?
         selectedBodyColorImage.color = BodyColor;
     }
     #endregion Unity Callbacks
@@ -50,20 +39,41 @@ public class NetworkUiConfigManager : NetworkBehaviour
         {
             PlayerConfigurables configurables = manager.LocalPlayer.Configurables;
 
-            // TODO this doesnt work for caching last sent values
-            // break into functions with vars above
-
-            string username = Username;
-            if (configurables.username != username)
-            {
-                configurables.CmdSetUsername(username);
-            }
-
-            Color bodyColor = BodyColor;
-            if (configurables.bodyColor != bodyColor)
-            {
-                configurables.CmdSetBodyColor(bodyColor);
-            }
+            PollUsernameUi(configurables);
+            PollBodyColorUi(configurables);
         }
     }
+
+    #region Username
+    [SerializeField] private TMP_Text usernameText;
+    private string Username => usernameText.text;
+    private string? setUsername = null;
+    private void PollUsernameUi(PlayerConfigurables configurables)
+    {
+        string username = Username;
+        if (setUsername == null || setUsername.Value != username)
+        {
+            configurables.CmdSetUsername(username);
+            setUsername = username;
+        }
+    }
+    #endregion Username
+
+    #region Body Color
+    [SerializeField] private Image selectedBodyColorImage;
+    [SerializeField] private Slider redBodyColorSlider;
+    [SerializeField] private Slider greenBodyColorSlider;
+    [SerializeField] private Slider blueBodyColorSlider;
+    private Color BodyColor => new(redBodyColorSlider.value, greenBodyColorSlider.value, blueBodyColorSlider.value);
+    private Color? setBodyColor = null;
+    private void PollBodyColorUi(PlayerConfigurables configurables)
+    {
+        Color bodyColor = BodyColor;
+        if (setBodyColor == null || setBodyColor.Value != bodyColor)
+        {
+            configurables.CmdSetBodyColor(bodyColor);
+            setBodyColor = bodyColor;
+        }
+    }
+    #endregion Body Color
 }

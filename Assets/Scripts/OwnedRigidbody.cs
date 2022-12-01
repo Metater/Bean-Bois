@@ -39,7 +39,7 @@ public class OwnedRigidbody : NetworkBehaviour
         Destroy(Rigidbody);
     }
 
-    public void SetColliders(bool enabled)
+    public void SetCollidersEnabled(bool enabled)
     {
         colliders.ForEach(c => c.enabled = enabled);
     }

@@ -97,12 +97,12 @@ public class ServerRoundManager : NetworkBehaviour
             player.RoundInit();
             if (playerNumber % 2 == 0)
             {
-                player.Spawn(blueTower.spawnPosition);
+                player.ServerSpawn(blueTower.spawnPosition);
                 bluePlayers.Add(player);
             }
             else
             {
-                player.Spawn(redTower.spawnPosition);
+                player.ServerSpawn(redTower.spawnPosition);
                 redPlayers.Add(player);
             }
             playerNumber++;

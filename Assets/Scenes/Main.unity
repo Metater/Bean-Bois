@@ -244,7 +244,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   ownedRigidbody: {fileID: 1208117}
-  dropForce: 5
+  dropForceMultiplier: 5
   modelGameObject: {fileID: 1299143245}
 --- !u!1 &6136455
 GameObject:
@@ -2775,7 +2775,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   ownedRigidbody: {fileID: 964952426}
-  dropForce: 5
+  dropForceMultiplier: 5
   modelGameObject: {fileID: 1586652253}
 --- !u!1 &969132549
 GameObject:
@@ -3990,7 +3990,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   ownedRigidbody: {fileID: 1398335005}
-  dropForce: 5
+  dropForceMultiplier: 5
   modelGameObject: {fileID: 302952438}
 --- !u!1 &1455787121
 GameObject:
@@ -5722,7 +5722,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   ownedRigidbody: {fileID: 2108477673031799000}
-  dropForce: 5
+  dropForceMultiplier: 5
   modelGameObject: {fileID: 2108477672054354087}
 --- !u!114 &2108477673031799000
 MonoBehaviour:

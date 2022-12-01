@@ -33,35 +33,37 @@ public class NetworkUiConfigManager : NetworkBehaviour
     }
     private void Start()
     {
-        StartCoroutine(PollUi());
+        InvokeRepeating(nameof(PollUi), 0, uiPollPeriod);
     }
     private void Update()
     {
+        // TODO update only on change?
         selectedBodyColorImage.color = BodyColor;
     }
     #endregion Unity Callbacks
 
-    private IEnumerator PollUi()
+    // Not a coroutine, because those are cancelled on gameobject disable
+    // And it is disabled by the network identity
+    private void PollUi()
     {
-        while (true)
+        if (!manager.IsLocalPlayerNull)
         {
-            if (!manager.IsLocalPlayerNull)
+            PlayerConfigurables configurables = manager.LocalPlayer.Configurables;
+
+            // TODO this doesnt work for caching last sent values
+            // break into functions with vars above
+
+            string username = Username;
+            if (configurables.username != username)
             {
-                PlayerConfigurables configurables = manager.LocalPlayer.Configurables;
-
-                string username = Username;
-                if (configurables.username != username)
-                {
-                    configurables.CmdSetUsername(username);
-                }
-
-                Color bodyColor = BodyColor;
-                if (configurables.bodyColor != bodyColor)
-                {
-                    configurables.CmdSetBodyColor(bodyColor);
-                }
+                configurables.CmdSetUsername(username);
             }
-            yield return new WaitForSeconds(uiPollPeriod);
+
+            Color bodyColor = BodyColor;
+            if (configurables.bodyColor != bodyColor)
+            {
+                configurables.CmdSetBodyColor(bodyColor);
+            }
         }
     }
 }

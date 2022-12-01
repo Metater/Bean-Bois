@@ -80,7 +80,5 @@ public class GameManager : MonoBehaviour
     }
     
     #region Events
-    [Server]
-    
     #endregion Events
 }

@@ -8,7 +8,7 @@ public abstract class Item : NetworkBehaviour
     private GameManager manager;
 
     [SerializeField] protected OwnedRigidbody ownedRigidbody;
-    [SerializeField] protected float dropForceMultiplier; // TODO value is 5
+    [SerializeField] protected float dropForceMultiplier;
     [SerializeField] protected GameObject modelGameObject;
 
     public bool IsHeld { get; private set; } = false;
@@ -60,7 +60,7 @@ public abstract class Item : NetworkBehaviour
         IsHeld = true;
 
         // Disable item colliders while picked up
-        ownedRigidbody.SetColliders(false);
+        ownedRigidbody.SetCollidersEnabled(false);
         // When the object is picked up, disable the rigidbody if it exists
         // Nobody needs physics now
         ownedRigidbody.Disable();
@@ -73,7 +73,7 @@ public abstract class Item : NetworkBehaviour
         IsHeld = false;
 
         // When object is dropped, enable item colliders for everyone
-        ownedRigidbody.SetColliders(true);
+        ownedRigidbody.SetCollidersEnabled(true);
 
         // When dropped and object is owned
         // It is now the owners responsibilty to control the rigidbody for the item
@@ -86,7 +86,7 @@ public abstract class Item : NetworkBehaviour
 
         DropProtected();
     }
-    // Client and Server
+    // Client and Host
     public void Select()
     {
         // Enable visual while selected for everyone
@@ -94,7 +94,7 @@ public abstract class Item : NetworkBehaviour
 
         SelectProtected();
     }
-    // Client and Server
+    // Client and Host
     public void Deselect()
     {
         // Disable visual when deselected
@@ -109,13 +109,6 @@ public abstract class Item : NetworkBehaviour
     protected abstract void DeselectProtected();
     protected abstract void LeftClickProtected();
     protected abstract void RightClickProtected();
-
-    [Server]
-    public void ServerEnableOwnedRigidbody()
-    {
-        // Server controls rigidbody now
-        ownedRigidbody.Disable();
-    }
 
     [Server]
     public void ServerDisableOwnedRigidbody()

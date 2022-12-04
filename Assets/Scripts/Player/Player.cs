@@ -1,6 +1,7 @@
 using Mirror;
 using Mirror.Examples.Benchmark;
 using ParrelSync;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -25,7 +26,9 @@ public class Player : NetworkBehaviour
     public PlayerMovement Movement => Get<PlayerMovement>();
     public PlayerInteraction Interaction => Get<PlayerInteraction>();
     public PlayerConfigurables Configurables => Get<PlayerConfigurables>();
-    public PlayerEvents Events => Get<PlayerEvents>();
+
+    public event Action OnStartedSpectating;
+    public event Action OnStoppedSpectating;
 
     public T Get<T>() where T : PlayerComponent
     {
@@ -48,6 +51,16 @@ public class Player : NetworkBehaviour
         playerComponents.ForEach(c => c.Init(manager, refs, this));
 
         playerComponents.ForEach(c => c.PlayerAwake());
+
+        OnStartedSpectating += () =>
+        {
+            print("test start spectating");
+        };
+
+        OnStoppedSpectating += () =>
+        {
+            print("test start spectating");
+        };
     }
     private void Start() => playerComponents.ForEach(c => c.PlayerStart());
     private void Update()
@@ -111,35 +124,35 @@ public class Player : NetworkBehaviour
     #region Round Lifecycle
     public void RoundInit() => playerComponents.ForEach(c => c.PlayerRoundInit());
     [Command]
-    public void CmdSpectate()
+    public void CmdStartSpectating()
     {
         if (!isSpectating)
         {
             isSpectating = true;
+            Movement.GeneralTeleport(refs.spectatorBoxTransform.position);
         }
     }
     private void OnIsSpectatingChange(bool _, bool newIsSpectating)
     {
-        if (!isLocalPlayer)
-        {
-            return;
-        }
-
         if (newIsSpectating) // Started spectating
         {
-            Movement.GeneralTeleport(refs.spectatorBoxTransform.position);
+            OnStartedSpectating?.Invoke();
+        }
+        else // Stopped spectating
+        {
+            OnStoppedSpectating?.Invoke();
         }
     }
     // TODO could just use isSpectating sync var, then subscribe to the event in
     // Movement, to replace movement.GeneralTeleport()
     // TODO dont need, spawn, round start, spectatic, round stop
     [Server]
-    public void ServerSpawn(Vector3 spawnPosition)
+    public void ServerStopSpectating(Vector3 teleportPosition)
     {
         if (isSpectating)
         {
             isSpectating = false;
-            Movement.GeneralTeleport(spawnPosition);
+            Movement.GeneralTeleport(teleportPosition);
         }
     }
     #endregion Round Lifecycle

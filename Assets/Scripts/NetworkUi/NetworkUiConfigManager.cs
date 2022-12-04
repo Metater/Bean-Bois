@@ -47,11 +47,11 @@ public class NetworkUiConfigManager : NetworkBehaviour
     #region Username
     [SerializeField] private TMP_Text usernameText;
     private string Username => usernameText.text;
-    private string? setUsername = null;
+    private string setUsername = null;
     private void PollUsernameUi(PlayerConfigurables configurables)
     {
         string username = Username;
-        if (setUsername == null || setUsername.Value != username)
+        if (setUsername == null || setUsername != username)
         {
             configurables.CmdSetUsername(username);
             setUsername = username;

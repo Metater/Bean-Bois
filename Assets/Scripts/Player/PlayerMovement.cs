@@ -46,7 +46,7 @@ public class PlayerMovement : PlayerComponent
 
         if (transform.position.y < 0)
         {
-            player.CmdSpectate();
+            player.CmdStartSpectating();
         }
 
         UpdateMovementVectors();
@@ -157,7 +157,7 @@ public class PlayerMovement : PlayerComponent
             hit.gameObject.CompareTag("Base") ||
             hit.gameObject.CompareTag("SpectatorBox"))
         {
-            player.CmdSpectate();
+            player.CmdStartSpectating();
         }
     }
 

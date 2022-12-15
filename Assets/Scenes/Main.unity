@@ -5475,7 +5475,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scrollMaterial: {fileID: 2100000, guid: 1e0ebee60d07e4b40a6ea0581ebf634a, type: 2}
-  scrollVelocity: {x: 0.25, y: 0}
+  scrollVelocity: {x: 0, y: 0.25}
 --- !u!114 &2026857978
 MonoBehaviour:
   m_ObjectHideFlags: 0

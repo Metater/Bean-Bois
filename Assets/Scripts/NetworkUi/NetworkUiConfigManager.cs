@@ -10,7 +10,7 @@ public class NetworkUiConfigManager : NetworkBehaviour
 {
     private GameManager manager;
 
-    [SerializeField] private float uiPollPeriod;
+    [Range(0, 1f)] [SerializeField] private float uiPollPeriod;
 
     #region Unity Callbacks
     private void Awake()
@@ -32,7 +32,7 @@ public class NetworkUiConfigManager : NetworkBehaviour
     #endregion Unity Callbacks
 
     // Not a coroutine, because those are cancelled on gameobject disable
-    // And it is disabled by the network identity
+    // And it is disabled by the network identity while disconnected
     private void PollUi()
     {
         if (!manager.IsLocalPlayerNull)

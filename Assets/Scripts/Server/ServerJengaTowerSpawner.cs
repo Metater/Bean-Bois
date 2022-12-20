@@ -41,7 +41,7 @@ public class ServerJengaTowerSpawner : NetworkBehaviour
             {
                 if (block != null)
                 {
-                    block.NetworkDestroy();
+                    NetworkServer.Destroy(block.gameObject);
                 }
             }
             easterEggBlocks.Clear();

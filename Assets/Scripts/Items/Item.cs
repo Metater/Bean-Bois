@@ -54,7 +54,7 @@ public abstract class Item : NetworkBehaviour
     }
     #endregion Mirror Callbacks
 
-    // Client and Server
+    // Everyone
     public void Pickup()
     {
         IsHeld = true;
@@ -67,7 +67,7 @@ public abstract class Item : NetworkBehaviour
 
         PickupProtected();
     }
-    // Client and Server
+    // Everyone
     public void Drop(Vector3 dropVector, Vector3 velocity)
     {
         IsHeld = false;
@@ -86,7 +86,7 @@ public abstract class Item : NetworkBehaviour
 
         DropProtected();
     }
-    // Client and Host
+    [Client]
     public void Select()
     {
         // Enable visual while selected for everyone
@@ -94,7 +94,7 @@ public abstract class Item : NetworkBehaviour
 
         SelectProtected();
     }
-    // Client and Host
+    [Client]
     public void Deselect()
     {
         // Disable visual when deselected

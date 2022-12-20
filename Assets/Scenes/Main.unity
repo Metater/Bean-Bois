@@ -1123,7 +1123,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
-  uiPollPeriod: 1
+  uiPollPeriod: 0.25
   usernameText: {fileID: 1895757340}
   selectedBodyColorImage: {fileID: 1707210981}
   redBodyColorSlider: {fileID: 6136457}

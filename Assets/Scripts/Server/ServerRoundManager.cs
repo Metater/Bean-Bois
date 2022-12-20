@@ -75,9 +75,9 @@ public class ServerRoundManager : NetworkBehaviour
     {
         CleanupNull();
 
-        blueTower.blocks.ForEach(b => b.NetworkDestroy());
+        blueTower.blocks.ForEach(b => NetworkServer.Destroy(b.gameObject));
         bluePlayers.Clear();
-        redTower.blocks.ForEach(b => b.NetworkDestroy());
+        redTower.blocks.ForEach(b => NetworkServer.Destroy(b.gameObject));
         redPlayers.Clear();
 
         waitTimeRemaining = waitingPeriod;

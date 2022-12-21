@@ -42,7 +42,7 @@ public class ServerRoundManager : NetworkBehaviour
         {
             foreach (var player in manager.PlayerLookup.Refs)
             {
-                player.isSpectating = true;
+                player.ServerStartSpectating();
             }
 
             if (manager.PlayerLookup.Refs.Count() < 2)
@@ -95,7 +95,6 @@ public class ServerRoundManager : NetworkBehaviour
             int index = Random.Range(0, players.Count);
             Player player = players[index];
             players.RemoveAt(index);
-            player.RoundInit();
             if (playerNumber % 2 == 0)
             {
                 player.ServerStopSpectating(blueTower.spawnPosition);

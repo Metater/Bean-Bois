@@ -20,17 +20,11 @@ public class Player : NetworkBehaviour
     [SerializeField] private float ballThrowSpeed;
     [SerializeField] private float ballThrowDistance;
 
-    [SyncVar(hook = nameof(OnIsSpectatingChange))]
-    public bool isSpectating = true;
-
     public PlayerMovement Movement => Get<PlayerMovement>();
     public PlayerInteraction Interaction => Get<PlayerInteraction>();
     public PlayerConfigurables Configurables => Get<PlayerConfigurables>();
 
-    public event Action OnStartedSpectating;
-    public event Action OnStoppedSpectating;
-
-    public T Get<T>() where T : PlayerComponent
+    private T Get<T>() where T : PlayerComponent
     {
         foreach (var playerComponent in playerComponents)
         {
@@ -51,16 +45,6 @@ public class Player : NetworkBehaviour
         playerComponents.ForEach(c => c.Init(manager, refs, this));
 
         playerComponents.ForEach(c => c.PlayerAwake());
-
-        OnStartedSpectating += () =>
-        {
-            print("test start spectating");
-        };
-
-        OnStoppedSpectating += () =>
-        {
-            print("test start spectating");
-        };
     }
     private void Start() => playerComponents.ForEach(c => c.PlayerStart());
     private void Update()
@@ -121,15 +105,40 @@ public class Player : NetworkBehaviour
     }
     #endregion Mirror Callbacks
 
-    #region Round Lifecycle
-    public void RoundInit() => playerComponents.ForEach(c => c.PlayerRoundInit());
+    #region Spectating
+    [SyncVar(hook = nameof(OnIsSpectatingChange))]
+    public bool isSpectating = true;
+    public event Action OnStartedSpectating;
+    public event Action OnStoppedSpectating;
     [Command]
     public void CmdStartSpectating()
+    {
+        ServerStartSpectating();
+    }
+    [Server]
+    public void ServerStartSpectating()
     {
         if (!isSpectating)
         {
             isSpectating = true;
+            if (isServerOnly)
+            {
+                OnStartedSpectating?.Invoke();
+            }
             Movement.GeneralTeleport(refs.spectatorBoxTransform.position);
+        }
+    }
+    [Server]
+    public void ServerStopSpectating(Vector3 teleportPosition)
+    {
+        if (isSpectating)
+        {
+            isSpectating = false;
+            if (isServerOnly)
+            {
+                OnStoppedSpectating?.Invoke();
+            }
+            Movement.GeneralTeleport(teleportPosition);
         }
     }
     private void OnIsSpectatingChange(bool _, bool newIsSpectating)
@@ -143,19 +152,7 @@ public class Player : NetworkBehaviour
             OnStoppedSpectating?.Invoke();
         }
     }
-    // TODO could just use isSpectating sync var, then subscribe to the event in
-    // Movement, to replace movement.GeneralTeleport()
-    // TODO dont need, spawn, round start, spectatic, round stop
-    [Server]
-    public void ServerStopSpectating(Vector3 teleportPosition)
-    {
-        if (isSpectating)
-        {
-            isSpectating = false;
-            Movement.GeneralTeleport(teleportPosition);
-        }
-    }
-    #endregion Round Lifecycle
+    #endregion Spectating
 
     [Command(requiresAuthority = false)]
     public void CmdThrowBall(Vector3 position, Vector3 direction)

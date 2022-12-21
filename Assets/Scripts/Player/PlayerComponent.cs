@@ -20,5 +20,4 @@ public abstract class PlayerComponent : NetworkBehaviour
     public virtual void PlayerStart() { }
     public virtual void PlayerUpdate() { }
     public virtual void PlayerLateUpdate() { }
-    public virtual void PlayerRoundInit() { }
 }

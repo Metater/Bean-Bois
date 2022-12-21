@@ -1,4 +1,5 @@
 using Mirror;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
@@ -37,6 +38,22 @@ public class PlayerMovement : PlayerComponent
     private double srbStopTime;
 
     #region Player Callbacks
+    public override void PlayerAwake()
+    {
+        void OnDeltaSpectating()
+        {
+            if (!isLocalPlayer)
+            {
+                return;
+            }
+
+            isSrbAvailable = true;
+            refs.srbAvailableText.gameObject.SetActive(true);
+        }
+
+        player.OnStartedSpectating += OnDeltaSpectating;
+        player.OnStoppedSpectating += OnDeltaSpectating;
+    }
     public override void PlayerUpdate()
     {
         if (!isLocalPlayer)
@@ -51,16 +68,6 @@ public class PlayerMovement : PlayerComponent
 
         UpdateMovementVectors();
         UpdateMovement();
-    }
-    public override void PlayerRoundInit()
-    {
-        if (!isLocalPlayer)
-        {
-            return;
-        }
-
-        isSrbAvailable = true;
-        refs.srbAvailableText.gameObject.SetActive(true);
     }
     #endregion Player Callbacks
 

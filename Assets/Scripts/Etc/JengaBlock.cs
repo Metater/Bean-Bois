@@ -15,9 +15,9 @@ public class JengaBlock : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        bool isLava = collision.gameObject.CompareTag("Lava");
-        bool isSpectatorBox = collision.gameObject.CompareTag("SpectatorBox");
-        if (isServer && (isLava || isSpectatorBox))
+        if (isServer &&
+            (collision.gameObject.CompareTag("Lava") ||
+            collision.gameObject.CompareTag("SpectatorBox")))
         {
             NetworkServer.Destroy(gameObject);
         }

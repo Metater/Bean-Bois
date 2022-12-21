@@ -2,6 +2,7 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class PlayerInteraction : PlayerComponent
 {
@@ -16,20 +17,13 @@ public class PlayerInteraction : PlayerComponent
     [SerializeField] private float itemRotationSlerpMultiplier;
     private readonly Item[] slots = new Item[SlotCount];
     private int selectedSlotLocal = 0;
-    [SyncVar(hook = nameof(OnSlotChanged))]
-    public int selectedSlotSynced = 0;
+    [SyncVar(hook = nameof(OnSlotChanged))] public int selectedSlotSynced = 0;
 
     [Header("Crosshair Colors")]
     [SerializeField] private Color crosshairDefaultColor;
     [SerializeField] private Color crosshairHoverItemColor;
     #endregion Fields
 
-    // TODO Separate item pickup/drop logic and item/slot logic
-
-    public override void PlayerAwake()
-    {
-        manager = FindObjectOfType<GameManager>(true);
-    }
     public override void PlayerUpdate()
     {
         if (!isLocalPlayer)
@@ -38,6 +32,7 @@ public class PlayerInteraction : PlayerComponent
         }
 
         Item selectedItem = slots[selectedSlotLocal];
+
         Color crosshairColor = crosshairDefaultColor;
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         if (selectedItem == null && Physics.Raycast(ray, out var hit, reachDistance))
@@ -62,9 +57,17 @@ public class PlayerInteraction : PlayerComponent
             {
                 CmdDropItem(selectedItem.netId, Camera.main.transform.forward, player.Movement.GetCurrentVelocity());
             }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                selectedItem.LeftClick();
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                selectedItem.RightClick();
+            }
         }
 
-        // TODO also do this on teleport, make event
         foreach (var item in slots)
         {
             if (item == null || !item.isOwned)
@@ -211,20 +214,17 @@ public class PlayerInteraction : PlayerComponent
             for (int i = 0; i < 3; i++)
             {
                 Item slot = slots[i];
-                if (slot == null)
+                if (slot == null || slot.netId != netId)
                 {
                     continue;
                 }
 
-                if (slot.netId == netId)
+                if (isServerOnly)
                 {
-                    if (isServerOnly)
-                    {
-                        SharedDropItem(item, i, dropVector, velocity);
-                    }
-                    RpcDropItem(netId, i, dropVector, velocity);
-                    break;
+                    SharedDropItem(item, i, dropVector, velocity);
                 }
+                RpcDropItem(netId, i, dropVector, velocity);
+                break;
             }
         }
     }

@@ -15,7 +15,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6588919553824288697
 Transform:
   m_ObjectHideFlags: 0
@@ -265,7 +265,6 @@ MonoBehaviour:
   syncInterval: 0
   gripTransform: {fileID: 124740535018042161}
   reachDistance: 3
-  itemSmoothTime: 0
   itemRotationSlerpMultiplier: 20
   selectedSlotSynced: 0
   crosshairDefaultColor: {r: 1, g: 1, b: 1, a: 0.49803922}

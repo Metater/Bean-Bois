@@ -3192,7 +3192,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   jengaTowerSpawner: {fileID: 1004599820}
-  waitingPeriod: 15
+  waitingPeriod: 150000
 --- !u!1 &1031076429
 GameObject:
   m_ObjectHideFlags: 0

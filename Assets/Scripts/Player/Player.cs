@@ -106,8 +106,7 @@ public class Player : NetworkBehaviour
     #endregion Mirror Callbacks
 
     #region Spectating
-    [SyncVar(hook = nameof(OnIsSpectatingChange))]
-    public bool isSpectating = true;
+    [SyncVar(hook = nameof(OnIsSpectatingChange))] public bool isSpectating = true;
     public event Action OnStartedSpectating;
     public event Action OnStoppedSpectating;
     [Command]

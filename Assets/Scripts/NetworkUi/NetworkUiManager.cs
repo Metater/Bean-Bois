@@ -16,8 +16,7 @@ public class NetworkUiManager : NetworkBehaviour
 
     #region Main Text
     [SerializeField] private TMP_Text globalTextText;
-    [SyncVar(hook = nameof(OnGlobalTextChange))]
-    public string globalText = "";
+    [SyncVar(hook = nameof(OnGlobalTextChange))] public string globalText = "";
     private void OnGlobalTextChange(string _, string newGlobalText)
     {
         globalTextText.text = newGlobalText;

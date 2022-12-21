@@ -102,6 +102,16 @@ public abstract class Item : NetworkBehaviour
 
         DeselectProtected();
     }
+    [Client]
+    public void LeftClick()
+    {
+        LeftClickProtected();
+    }
+    [Client]
+    public void RightClick()
+    {
+        RightClickProtected();
+    }
 
     protected abstract void PickupProtected();
     protected abstract void DropProtected();

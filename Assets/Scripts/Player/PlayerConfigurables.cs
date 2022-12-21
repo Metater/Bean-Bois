@@ -7,10 +7,6 @@ using UnityEngine;
 
 public class PlayerConfigurables : PlayerComponent
 {
-    public override void PlayerAwake()
-    {
-        manager = FindObjectOfType<GameManager>(true);
-    }
     public override void PlayerLateUpdate()
     {
         // Must occur after player movement update
@@ -27,8 +23,7 @@ public class PlayerConfigurables : PlayerComponent
     private const int UsernameMaxLength = 16;
     [Header("Username")]
     [SerializeField] private TMP_Text usernameText;
-    [SyncVar(hook = nameof(OnUsernameChange))]
-    public string username = "";
+    [SyncVar(hook = nameof(OnUsernameChange))] public string username = "";
     [Command]
     public void CmdSetUsername(string newUsername)
     {
@@ -53,8 +48,7 @@ public class PlayerConfigurables : PlayerComponent
     #region Body Color
     [Header("Body Color")]
     [SerializeField] private MeshRenderer bodyMeshRenderer;
-    [SyncVar(hook = nameof(OnBodyColorChange))]
-    public Color bodyColor = Color.white;
+    [SyncVar(hook = nameof(OnBodyColorChange))] public Color bodyColor = Color.white;
     [Command]
     public void CmdSetBodyColor(Color newBodyColor)
     {
@@ -67,8 +61,6 @@ public class PlayerConfigurables : PlayerComponent
             return;
         }
 
-        // TODO does this work with three people?
-        // GetComponent().material? https://mirror-networking.gitbook.io/docs/guides/synchronization/syncvar-hooks
         bodyMeshRenderer.material.color = newBodyColor;
     }
     #endregion Body Color

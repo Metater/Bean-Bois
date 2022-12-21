@@ -32,7 +32,7 @@ public class RollbackNetworkTransform : NetworkBehaviour
     [Tooltip("The Transform component to sync. May be on on this GameObject, or on a child.")]
     public Transform target;
 
-    // TODO SyncDirection { ClientToServer, ServerToClient } is easier?
+    // TODOe SyncDirection { ClientToServer, ServerToClient } is easier?
     [Obsolete("NetworkTransform clientAuthority was replaced with syncDirection. To enable client authority, set SyncDirection to ClientToServer in the Inspector.")]
     [Header("[Obsolete]")] // Unity doesn't show obsolete warning for fields. do it manually.
     [Tooltip("Set to true if moves come from owner client, set to false if moves always come from server")]
@@ -368,7 +368,7 @@ public class RollbackNetworkTransform : NetworkBehaviour
         // since host does not send anything to update the server, any client
         // authoritative movement done by the host will have to be broadcasted
         // here by checking IsClientWithAuthority.
-        // TODO send same time that NetworkServer sends time snapshot?
+        // TODOe send same time that NetworkServer sends time snapshot?
         if (NetworkTime.localTime >= lastServerSendTime + NetworkServer.sendInterval && // same interval as time interpolation!
             (syncDirection == SyncDirection.ServerToClient || IsClientWithAuthority))
         {
@@ -573,7 +573,7 @@ public class RollbackNetworkTransform : NetworkBehaviour
         // interpolation will automatically continue.
         target.position = destination;
 
-        // TODO
+        // TODOe
         // what if we still receive a snapshot from before the interpolation?
         // it could easily happen over unreliable.
         // -> maybe add destination as first entry?
@@ -589,7 +589,7 @@ public class RollbackNetworkTransform : NetworkBehaviour
         // interpolation will automatically continue.
         target.SetPositionAndRotation(destination, rotation);
 
-        // TODO
+        // TODOe
         // what if we still receive a snapshot from before the interpolation?
         // it could easily happen over unreliable.
         // -> maybe add destination as first entry?
@@ -607,7 +607,7 @@ public class RollbackNetworkTransform : NetworkBehaviour
         //       * Some people use client authority with server sided checks
         //         so the server should be able to reset position if needed.
 
-        // TODO what about host mode?
+        // TODOe what about host mode?
         OnTeleport(destination);
     }
 
@@ -623,7 +623,7 @@ public class RollbackNetworkTransform : NetworkBehaviour
         //       * Some people use client authority with server sided checks
         //         so the server should be able to reset position if needed.
 
-        // TODO what about host mode?
+        // TODOe what about host mode?
         OnTeleport(destination, rotation);
     }
 
@@ -636,14 +636,14 @@ public class RollbackNetworkTransform : NetworkBehaviour
         // client can only teleport objects that it has authority over.
         if (syncDirection != SyncDirection.ClientToServer) return;
 
-        // TODO what about host mode?
+        // TODOe what about host mode?
         OnTeleport(destination);
 
         // if a client teleports, we need to broadcast to everyone else too
-        // TODO the teleported client should ignore the rpc though.
+        // TODOe the teleported client should ignore the rpc though.
         //      otherwise if it already moved again after teleporting,
         //      the rpc would come a little bit later and reset it once.
-        // TODO or not? if client ONLY calls Teleport(pos), the position
+        // TODOe or not? if client ONLY calls Teleport(pos), the position
         //      would only be set after the rpc. unless the client calls
         //      BOTH Teleport(pos) and target.position=pos
         RpcTeleport(destination);
@@ -658,14 +658,14 @@ public class RollbackNetworkTransform : NetworkBehaviour
         // client can only teleport objects that it has authority over.
         if (syncDirection != SyncDirection.ClientToServer) return;
 
-        // TODO what about host mode?
+        // TODOe what about host mode?
         OnTeleport(destination, rotation);
 
         // if a client teleports, we need to broadcast to everyone else too
-        // TODO the teleported client should ignore the rpc though.
+        // TODOe the teleported client should ignore the rpc though.
         //      otherwise if it already moved again after teleporting,
         //      the rpc would come a little bit later and reset it once.
-        // TODO or not? if client ONLY calls Teleport(pos), the position
+        // TODOe or not? if client ONLY calls Teleport(pos), the position
         //      would only be set after the rpc. unless the client calls
         //      BOTH Teleport(pos) and target.position=pos
         RpcTeleport(destination, rotation);

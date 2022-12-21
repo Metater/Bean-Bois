@@ -50,9 +50,8 @@ public class OwnedRigidbody : NetworkBehaviour
         // Has choice to let this be destroyed or not
         // May want held items to diseapper when player logs out
         // bc of loadouts?5
-        netIdentity.RemoveClientAuthority();
-
-        print("IT WORKED!!!");
+        // TODO ignoring this for now
+        // netIdentity.RemoveClientAuthority();
 
         OnOwnerDisconnected?.Invoke();
     }

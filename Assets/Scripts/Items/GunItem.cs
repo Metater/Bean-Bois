@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class GunItem : Item
+public class GunItem : Item
 {
     protected override void PickupProtected()
     {

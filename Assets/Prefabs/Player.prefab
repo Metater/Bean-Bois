@@ -265,7 +265,7 @@ MonoBehaviour:
   syncInterval: 0
   gripTransform: {fileID: 124740535018042161}
   reachDistance: 3
-  itemRotationSlerpMultiplier: 20
+  itemRotationSlerpMultiplier: 50
   selectedSlotSynced: 0
   crosshairDefaultColor: {r: 1, g: 1, b: 1, a: 0.49803922}
   crosshairHoverItemColor: {r: 0.20392157, g: 0.5647059, b: 0.8117647, a: 0.49803922}

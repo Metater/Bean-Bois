@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(OwnedRigidbody))]
 public abstract class Item : NetworkBehaviour
 {
     private GameManager manager;
 
-    [SerializeField] protected OwnedRigidbody ownedRigidbody;
+    protected OwnedRigidbody ownedRigidbody;
+
     [SerializeField] protected float dropForceMultiplier;
     [SerializeField] protected GameObject modelGameObject;
 
@@ -20,6 +22,8 @@ public abstract class Item : NetworkBehaviour
     private void Awake()
     {
         manager = FindObjectOfType<GameManager>(true);
+
+        ownedRigidbody = GetComponent<OwnedRigidbody>();
     }
     #endregion Unity Callbacks
 

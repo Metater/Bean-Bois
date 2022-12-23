@@ -23,6 +23,9 @@ public class GunItem : Item
     protected override void LeftClickProtected()
     {
         print($"L: {gameObject.name}");
+
+        var actions = manager.LocalPlayer.Get<PlayerActions>();
+        actions.CmdShoot();
     }
     protected override void RightClickProtected()
     {

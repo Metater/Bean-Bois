@@ -22,10 +22,10 @@ public class BasicItem : Item
     }
     protected override void LeftClickProtected()
     {
-        print($"L: {gameObject.name}");
+
     }
     protected override void RightClickProtected()
     {
-        print($"R: {gameObject.name}");
+
     }
 }

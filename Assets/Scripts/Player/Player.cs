@@ -13,18 +13,17 @@ public class Player : NetworkBehaviour
     private GameManager manager;
     private PlayerReferences refs;
 
-    [SerializeField] private List<PlayerComponent> playerComponents; 
-
+    [SerializeField] private List<PlayerComponent> playerComponents;
     [SerializeField] private List<GameObject> invisibleToSelf;
 
     [SerializeField] private float ballThrowSpeed;
     [SerializeField] private float ballThrowDistance;
 
-    public PlayerMovement Movement => Get<PlayerMovement>();
-    public PlayerInteraction Interaction => Get<PlayerInteraction>();
-    public PlayerConfigurables Configurables => Get<PlayerConfigurables>();
+    // public PlayerMovement Movement => Get<PlayerMovement>();
+    // public PlayerInteraction Interaction => Get<PlayerInteraction>();
+    // public PlayerConfigurables Configurables => Get<PlayerConfigurables>();
 
-    private T Get<T>() where T : PlayerComponent
+    public T Get<T>() where T : PlayerComponent
     {
         foreach (var playerComponent in playerComponents)
         {
@@ -124,7 +123,7 @@ public class Player : NetworkBehaviour
             {
                 OnStartedSpectating?.Invoke();
             }
-            Movement.GeneralTeleport(refs.spectatorBoxTransform.position);
+            Get<PlayerMovement>().GeneralTeleport(refs.spectatorBoxTransform.position);
         }
     }
     [Server]
@@ -137,7 +136,7 @@ public class Player : NetworkBehaviour
             {
                 OnStoppedSpectating?.Invoke();
             }
-            Movement.GeneralTeleport(teleportPosition);
+            Get<PlayerMovement>().GeneralTeleport(teleportPosition);
         }
     }
     private void OnIsSpectatingChange(bool _, bool newIsSpectating)

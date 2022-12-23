@@ -1,13 +1,14 @@
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(OwnedRigidbody))]
 public abstract class Item : NetworkBehaviour
 {
-    private GameManager manager;
-
+    protected GameManager manager;
     protected OwnedRigidbody ownedRigidbody;
 
     [SerializeField] protected float dropForceMultiplier;
@@ -22,8 +23,26 @@ public abstract class Item : NetworkBehaviour
     private void Awake()
     {
         manager = FindObjectOfType<GameManager>(true);
-
         ownedRigidbody = GetComponent<OwnedRigidbody>();
+    }
+    private void OnValidate()
+    {
+        // Ensure all items and children of items have the "Item" layer set
+        EditorApplication.delayCall += () =>
+        {
+            if (Application.isPlaying)
+            {
+                return;
+            }
+
+            int layer = LayerMask.NameToLayer("Item");
+            gameObject.layer = layer;
+            var children = gameObject.GetComponentsInChildren<Transform>(true);
+            foreach (Transform child in children)
+            {
+                child.gameObject.layer = layer;
+            }
+        };
     }
     #endregion Unity Callbacks
 

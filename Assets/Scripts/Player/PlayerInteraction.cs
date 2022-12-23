@@ -55,7 +55,7 @@ public class PlayerInteraction : PlayerComponent
         {
             if (Input.GetKeyDown(KeyCode.G) && selectedSlotLocal == selectedSlotSynced)
             {
-                CmdDropItem(selectedItem.netId, Camera.main.transform.forward, player.Movement.GetCurrentVelocity());
+                CmdDropItem(selectedItem.netId, Camera.main.transform.forward, player.Get<PlayerMovement>().GetCurrentVelocity());
             }
 
             if (Input.GetMouseButtonDown(0))

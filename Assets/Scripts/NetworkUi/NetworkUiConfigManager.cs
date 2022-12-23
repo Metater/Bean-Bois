@@ -37,7 +37,7 @@ public class NetworkUiConfigManager : NetworkBehaviour
     {
         if (!manager.IsLocalPlayerNull)
         {
-            PlayerConfigurables configurables = manager.LocalPlayer.Configurables;
+            PlayerConfigurables configurables = manager.LocalPlayer.Get<PlayerConfigurables>();
 
             PollUsernameUi(configurables);
             PollBodyColorUi(configurables);

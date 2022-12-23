@@ -56,11 +56,6 @@ public class PlayerConfigurables : PlayerComponent
     }
     private void OnBodyColorChange(Color _, Color newBodyColor)
     {
-        if (isLocalPlayer)
-        {
-            return;
-        }
-
         bodyMeshRenderer.material.color = newBodyColor;
     }
     #endregion Body Color

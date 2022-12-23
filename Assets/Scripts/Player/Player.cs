@@ -15,6 +15,7 @@ public class Player : NetworkBehaviour
 
     [SerializeField] private List<PlayerComponent> playerComponents;
     [SerializeField] private List<GameObject> invisibleToSelf;
+    [SerializeField] private Transform handsTransform;
 
     [SerializeField] private float ballThrowSpeed;
     [SerializeField] private float ballThrowDistance;
@@ -66,7 +67,8 @@ public class Player : NetworkBehaviour
     {
         // Position own camera
         Camera.main.transform.SetParent(transform);
-        Camera.main.transform.localPosition = new Vector3(0, 1.6f, 0);
+        Camera.main.transform.localPosition = handsTransform.localPosition;
+        //Camera.main.transform.localPosition = new Vector3(0, 1.6f, 0);
 
         // Make own GameObjects invisible
         invisibleToSelf.ForEach(go => go.SetActive(false));

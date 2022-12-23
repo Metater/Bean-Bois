@@ -11,6 +11,7 @@ public class PlayerInteraction : PlayerComponent
     #region Fields
     [Header("Transforms")]
     [SerializeField] private Transform gripTransform;
+    [SerializeField] private Transform aimGripTransform;
 
     [Header("Interaction")]
     [SerializeField] private float reachDistance;
@@ -22,6 +23,9 @@ public class PlayerInteraction : PlayerComponent
     [Header("Crosshair Colors")]
     [SerializeField] private Color crosshairDefaultColor;
     [SerializeField] private Color crosshairHoverItemColor;
+
+    [Header("Aiming")]
+    [SerializeField] private float aimLerpMultiplier;
     #endregion Fields
 
     public override void PlayerUpdate()

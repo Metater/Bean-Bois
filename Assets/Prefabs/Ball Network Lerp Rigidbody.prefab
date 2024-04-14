@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 4866809238886477014}
   - component: {fileID: 4866809238886477015}
   - component: {fileID: 4866809238886477017}
-  m_Layer: 0
+  - component: {fileID: 6602530746306246047}
+  m_Layer: 7
   m_Name: Ball Network Lerp Rigidbody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51,8 +52,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
-  rb: {fileID: 4866809238886477014}
-  dropForce: 5
+  dropForceMultiplier: 0
   modelGameObject: {fileID: 4866809238891881358}
 --- !u!54 &4866809238886477014
 Rigidbody:
@@ -106,6 +106,29 @@ MonoBehaviour:
   lerpVelocityAmount: 0.25
   lerpPositionAmount: 0.25
   clientAuthority: 1
+--- !u!114 &6602530746306246047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4866809238886477018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e17d5cfd75a24a04bb7114299f0a42b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
+  colliders: []
+  mass: 0
+  drag: 0
+  angularDrag: 0
+  useGravity: 0
+  isKinematic: 0
+  interpolate: 0
+  collisionDetection: 0
 --- !u!1 &4866809238891881358
 GameObject:
   m_ObjectHideFlags: 0
@@ -115,7 +138,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4866809238891881357}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: --------MODEL--------
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,7 +173,7 @@ GameObject:
   - component: {fileID: 4866809239031396918}
   - component: {fileID: 4866809239031396919}
   - component: {fileID: 4866809239031396920}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}

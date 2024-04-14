@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 7186352111359070779}
   - component: {fileID: 7186352111359070778}
   - component: {fileID: 7186352111359070781}
-  m_Layer: 0
+  - component: {fileID: 7801220524421104067}
+  m_Layer: 7
   m_Name: Cube Network Lerp Rigidbody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51,8 +52,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
-  rb: {fileID: 7186352111359070779}
-  dropForce: 5
+  dropForceMultiplier: 0
   modelGameObject: {fileID: 7186352111455367752}
 --- !u!54 &7186352111359070779
 Rigidbody:
@@ -106,6 +106,29 @@ MonoBehaviour:
   lerpVelocityAmount: 0.5
   lerpPositionAmount: 0.25
   clientAuthority: 1
+--- !u!114 &7801220524421104067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7186352111359070780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e17d5cfd75a24a04bb7114299f0a42b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
+  colliders: []
+  mass: 0
+  drag: 0
+  angularDrag: 0
+  useGravity: 0
+  isKinematic: 0
+  interpolate: 0
+  collisionDetection: 0
 --- !u!1 &7186352111455367752
 GameObject:
   m_ObjectHideFlags: 0
@@ -115,7 +138,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7186352111455367753}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: --------MODEL--------
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,7 +173,7 @@ GameObject:
   - component: {fileID: 7186352112057879875}
   - component: {fileID: 7186352112057879874}
   - component: {fileID: 7186352112057879877}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
